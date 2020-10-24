@@ -1,5 +1,5 @@
 import pygame
-from Color import white,lightblue
+from Color import lightSquare,darkSquare
 from type import type
 from side import side
 from Square import Square
@@ -21,7 +21,7 @@ class Board:
         for i in range(8):
             for j in range(8):
                 if ((i + j) % 2 == 0): # we need to do this to add color to be like chess board.
-                    newSquare = Square(220 + 70 * j, 30 + 70 * i, 70, 70, white)  # the location of each of the square.
+                    newSquare = Square(220 + 70 * j, 30 + 70 * i, 70, 70, lightSquare)  # the location of each of the square.
                     piecelocation = (newSquare.x + 10, newSquare.y + 10)  # the location of each piece.
                     # add empty to every square first.
                     newSquare.addPieces(ChessPieces('Assets\Pieces\empty.png', piecelocation, type.Empty, None, side.noside))
@@ -61,7 +61,7 @@ class Board:
                     self.Squarelist[i].append(newSquare)
                 else:
                     # the same just another half.
-                    newSquare = Square(220 + 70 * j, 30 + 70 * i, 70, 70, lightblue)
+                    newSquare = Square(220 + 70 * j, 30 + 70 * i, 70, 70, darkSquare)
                     piecelocation = (newSquare.x + 10, newSquare.y + 10)
                     newSquare.addPieces(ChessPieces('Assets\Pieces\empty.png', piecelocation, type.Empty, None, side.noside))
                     if (i == 1):
@@ -99,8 +99,8 @@ class Board:
                     self.Squarelist[i].append(newSquare)
 
     def drawBoardAndPieces(self):
-        """ draw board and piece when things changes, ( draw squares according to the Squares in Squarelist, and draw piece
-        according to the piece location and imagefile in Squarelist)
+        """ draw board and piece when things changes, ( draw squares according to the Squares in Square list, and draw piece
+        according to the piece location and image file in Square list)
         """
         for i in range(8):
             for j in range(8):
@@ -116,7 +116,7 @@ class Board:
         return self.Squarelist[i][j]
 
     def detectClick(self):
-        """ detect the click in all the squares on the board and append the clicked square to the clicklisk """
+        """ detect the click in all the squares on the board and append the clicked square to the click list """
         for i in range(8):
             for j in range(8):
                 if (len(self.clicklist) == 0 and self.getSquare(i,j).getclick()):
@@ -129,7 +129,7 @@ class Board:
         square1 = self.clicklist[0]
         square2 = self.clicklist[1]
         if (square1.Piece.type != square2.Piece.type and square1.Piece.type != type.Empty and square2.Piece.type != type.Empty):
-            print(square1.Piece.type.value, "eat", square2.Piece.type.value, "to", self.toNotation(self.findIJSquare(square2)))
+            print(square1.Piece.type.value, "eat", square2.Piece.type.value, "at", self.toNotation(self.findIJSquare(square2)))
         else:
             print(square1.Piece.type.value, "to", self.toNotation(self.findIJSquare(square2)))
         piece1 = square1.Piece
@@ -137,6 +137,7 @@ class Board:
         location1 = piece1.getlocation()
         location2 = piece2.getlocation()
         self.doAnimation(location1,location2,piece1)
+
         (i,j) = self.findIJSquare(square1)
         self.getSquare(i,j).addPieces(ChessPieces('Assets\Pieces\empty.png', location1, type.Empty, None, side.noside))
         (i,j) = self.findIJSquare(square2)
@@ -164,6 +165,9 @@ class Board:
             pygame.time.delay(1)
             myPiece.addlocation((firstx + movementx, firsty + movementy))
             self.drawBoardAndPieces()
+            if i == 30:
+                moveSound = pygame.mixer.Sound('Assets/Sounds/moveSound.wav')
+                moveSound.play()
             self.screen.blit(myPiece.image, (firstx + movementx, firsty + movementy))
             pygame.display.update()
 
