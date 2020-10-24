@@ -1,0 +1,173 @@
+import pygame
+from Color import white,lightblue
+from type import type
+from side import side
+from Square import Square
+from ChessPiece import ChessPieces
+
+class Board:
+    def __init__(self,screen):
+        """ initialize the ChessBoard """
+        self.Squarelist = None # Squarelist will hold the list of rows of Squares.
+        self.clicklist = list() # clicklist will hold the chosen Square and Destination Square.
+        self.screen = screen # the screen passed from UI.py
+        self.InitializeBoard() # call to set up the board
+    def InitializeBoard(self):
+        """ return the initialized board as SquareList"""
+        self.Squarelist = list() # make it a list
+        for i in range(8):
+            mylist = list()
+            self.Squarelist.append(mylist)  # create rows
+        for i in range(8):
+            for j in range(8):
+                if ((i + j) % 2 == 0): # we need to do this to add color to be like chess board.
+                    newSquare = Square(220 + 70 * j, 30 + 70 * i, 70, 70, white)  # the location of each of the square.
+                    piecelocation = (newSquare.x + 10, newSquare.y + 10)  # the location of each piece.
+                    # add empty to every square first.
+                    newSquare.addPieces(ChessPieces('Assets\Pieces\empty.png', piecelocation, type.Empty, None, side.noside))
+                    # then change it if it's the case.
+                    if (i == 1):
+                        newSquare.addPieces(
+                            ChessPieces('Assets/Pieces/blackPawn.png', piecelocation, type.PawnB, j, side.blackside))
+                    if (i == 0):
+                        if (j == 0):
+                            newSquare.addPieces(
+                                ChessPieces('Assets/Pieces/blackRook.png', piecelocation, type.RookB, 0, side.blackside))
+                        if (j == 2):
+                            newSquare.addPieces(
+                                ChessPieces('Assets/Pieces/blackBishop.png', piecelocation, type.BishopB, 0, side.blackside))
+                        if (j == 4):
+                            newSquare.addPieces(
+                                ChessPieces('Assets\Pieces/blackKing.png', piecelocation, type.KingB, 0, side.blackside))
+                        if (j == 6):
+                            newSquare.addPieces(
+                                ChessPieces('Assets/Pieces/blackKnight.png', piecelocation, type.KnightB, 1, side.blackside))
+                    if (i == 6):
+                        newSquare.addPieces(
+                            ChessPieces('Assets\Pieces\whitePawn.png', piecelocation, type.PawnW, j, side.whiteside))
+                    if (i == 7):
+                        if (j == 1):
+                            newSquare.addPieces(
+                                ChessPieces('Assets\Pieces\whiteKnight.png', piecelocation, type.KnightW, 0, side.whiteside))
+                        if (j == 3):
+                            newSquare.addPieces(
+                                ChessPieces('Assets\Pieces\whiteQueen.png', piecelocation, type.QueenW, 0, side.whiteside))
+                        if (j == 5):
+                            newSquare.addPieces(
+                                ChessPieces('Assets\Pieces\whiteBishop.png', piecelocation, type.BishopW, 1, side.whiteside))
+                        if (j == 7):
+                            newSquare.addPieces(
+                                ChessPieces('Assets\Pieces\whiteRook.png', piecelocation, type.RookW, 1, side.whiteside))
+                    self.Squarelist[i].append(newSquare)
+                else:
+                    # the same just another half.
+                    newSquare = Square(220 + 70 * j, 30 + 70 * i, 70, 70, lightblue)
+                    piecelocation = (newSquare.x + 10, newSquare.y + 10)
+                    newSquare.addPieces(ChessPieces('Assets\Pieces\empty.png', piecelocation, type.Empty, None, side.noside))
+                    if (i == 1):
+                        newSquare.addPieces(
+                            ChessPieces('Assets/Pieces/blackPawn.png', piecelocation, type.PawnB, j, side.blackside))
+                    if (i == 0):
+                        if (j == 1):
+                            newSquare.addPieces(
+                                ChessPieces('Assets/Pieces/blackKnight.png', piecelocation, type.KnightB, 0, side.blackside))
+                        if (j == 3):
+                            newSquare.addPieces(
+                                ChessPieces('Assets\Pieces/blackQueen.png', piecelocation, type.QueenB, 0, side.blackside))
+                        if (j == 5):
+                            newSquare.addPieces(
+                                ChessPieces('Assets/Pieces/blackBishop.png', piecelocation, type.BishopB, 1, side.blackside))
+                        if (j == 7):
+                            newSquare.addPieces(
+                                ChessPieces('Assets/Pieces/blackRook.png', piecelocation, type.RookB, 1, side.blackside))
+                    if (i == 6):
+                        newSquare.addPieces(
+                            ChessPieces('Assets\Pieces\whitePawn.png', piecelocation, type.PawnW, j, side.whiteside))
+                    if (i == 7):
+                        if (j == 0):
+                            newSquare.addPieces(
+                                ChessPieces('Assets\Pieces\whiteRook.png', piecelocation, type.RookW, 0, side.whiteside))
+                        if (j == 2):
+                            newSquare.addPieces(
+                                ChessPieces('Assets\Pieces\whiteBishop.png', piecelocation, type.BishopW, 0, side.whiteside))
+                        if (j == 4):
+                            newSquare.addPieces(
+                                ChessPieces('Assets\Pieces\whiteKing.png', piecelocation, type.KingW, 0, side.whiteside))
+                        if (j == 6):
+                            newSquare.addPieces(
+                                ChessPieces('Assets\Pieces\whiteKnight.png', piecelocation, type.KnightW, 1, side.whiteside))
+                    self.Squarelist[i].append(newSquare)
+
+    def drawBoardAndPieces(self):
+        """ draw board and piece when things changes, ( draw squares according to the Squares in Squarelist, and draw piece
+        according to the piece location and imagefile in Squarelist)
+        """
+        for i in range(8):
+            for j in range(8):
+                if (len(self.clicklist) > 0 and (i,j) == self.findIJSquare(self.clicklist[0])):
+                    self.getSquare(i, j).drawSquare(self.screen,True)
+                else:
+                    self.getSquare(i,j).drawSquare(self.screen,False)
+                if (self.getSquare(i,j).Piece.type != type.Empty):
+                    self.getSquare(i,j).Piece.drawPieces(self.screen,self.getSquare(i,j))
+
+    def getSquare(self,i,j):
+        """ return squares at position (i,j) """
+        return self.Squarelist[i][j]
+
+    def detectClick(self):
+        """ detect the click in all the squares on the board and append the clicked square to the clicklisk """
+        for i in range(8):
+            for j in range(8):
+                if (len(self.clicklist) == 0 and self.getSquare(i,j).getclick()):
+                    self.clicklist.append(self.getSquare(i,j))
+                if (len(self.clicklist) == 1 and self.getSquare(i,j).getclick() and self.getSquare(i,j) != self.clicklist[0]):
+                    self.clicklist.append(self.getSquare(i,j))
+                    self.moveOrEat()
+
+    def moveOrEat(self):
+        square1 = self.clicklist[0]
+        square2 = self.clicklist[1]
+        if (square1.Piece.type != square2.Piece.type and square1.Piece.type != type.Empty and square2.Piece.type != type.Empty):
+            print(square1.Piece.type.value, "eat", square2.Piece.type.value, "to", self.toNotation(self.findIJSquare(square2)))
+        else:
+            print(square1.Piece.type.value, "to", self.toNotation(self.findIJSquare(square2)))
+        piece1 = square1.Piece
+        piece2 = square2.Piece
+        location1 = piece1.getlocation()
+        location2 = piece2.getlocation()
+        self.doAnimation(location1,location2,piece1)
+        (i,j) = self.findIJSquare(square1)
+        self.getSquare(i,j).addPieces(ChessPieces('Assets\Pieces\empty.png', location1, type.Empty, None, side.noside))
+        (i,j) = self.findIJSquare(square2)
+        self.getSquare(i,j).addPieces(piece1)
+
+
+    def findIJSquare(self,aSquare):
+        for i in range(8):
+            for j in range(8):
+                if(self.getSquare(i,j) == aSquare):
+                    return (i,j)
+        return False
+
+
+    def doAnimation(self,firstlocation,secondlocation,myPiece):
+        firstx = firstlocation[0]
+        firsty = firstlocation[1]
+        secondx = secondlocation[0]
+        secondy = secondlocation[1]
+        differencex = secondx - firstx
+        differencey = secondy - firsty
+        for i in range(70):
+            movementx = differencex / 70 * i
+            movementy = differencey / 70 * i
+            pygame.time.delay(1)
+            myPiece.addlocation((firstx + movementx, firsty + movementy))
+            self.drawBoardAndPieces()
+            self.screen.blit(myPiece.image, (firstx + movementx, firsty + movementy))
+            pygame.display.update()
+
+        self.clicklist.clear()
+    def toNotation(self,pos):
+        alphabetlist = ['A','B','C','D','E','F','G','H']
+        return alphabetlist[pos[1]]+str(abs(pos[0]-8))
