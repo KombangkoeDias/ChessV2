@@ -146,7 +146,7 @@ class Board:
         else:
             print(square1.Piece.type.value, "to", self.toNotation(self.findIJSquare(square2)))
 
-        self.doAnimation(location1,location2,square1,square2,piece1)
+        self.doAnimation(location1,location2,square1,square2,piece1) # doAnimation function gradually updates location of piece1
 
         (i,j) = self.findIJSquare(square1)
         self.getSquare(i,j).addPieces(ChessPieces('Assets\Pieces\empty.png', location1, type.Empty, None, side.noside))
