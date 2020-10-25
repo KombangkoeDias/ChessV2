@@ -136,7 +136,7 @@ class Board:
         piece2 = square2.Piece
         location1 = piece1.getlocation()
         location2 = piece2.getlocation()
-        self.doAnimation(location1,location2,piece1)
+        self.doAnimation(location1,location2,square1,square2,piece1)
 
         (i,j) = self.findIJSquare(square1)
         self.getSquare(i,j).addPieces(ChessPieces('Assets\Pieces\empty.png', location1, type.Empty, None, side.noside))
@@ -152,13 +152,16 @@ class Board:
         return False
 
 
-    def doAnimation(self,firstlocation,secondlocation,myPiece):
+    def doAnimation(self,firstlocation,secondlocation,square1,square2,myPiece):
         firstx = firstlocation[0]
         firsty = firstlocation[1]
         secondx = secondlocation[0]
         secondy = secondlocation[1]
-        differencex = secondx - firstx
-        differencey = secondy - firsty
+        (firsti,firstj) = self.findIJSquare(square1)
+        (secondi,secondj) = self.findIJSquare(square2)
+        differencex = (secondj - firstj) * 70
+        differencey = (secondi - firsti) * 70
+
         for i in range(70):
             movementx = differencex / 70 * i
             movementy = differencey / 70 * i
