@@ -4,6 +4,7 @@ from type import type
 from side import side
 from Square import Square
 from ChessPiece import ChessPieces
+from EvaluateMovesEngine import EvaluateMovesEngine
 
 class Board:
     def __init__(self,screen):
@@ -12,6 +13,7 @@ class Board:
         self.clicklist = list() # clicklist will hold the chosen Square and Destination Square.
         self.screen = screen # the screen passed from UI.py
         self.InitializeBoard() # call to set up the board
+        self.evaluateMovesEngine = EvaluateMovesEngine(self)
     def InitializeBoard(self):
         """ return the initialized board as SquareList"""
         self.Squarelist = list() # make it a list
@@ -119,23 +121,31 @@ class Board:
         """ detect the click in all the squares on the board and append the clicked square to the click list """
         for i in range(8):
             for j in range(8):
-                if (len(self.clicklist) == 0 and self.getSquare(i,j).getclick()):
-                    self.clicklist.append(self.getSquare(i,j))
-                if (len(self.clicklist) == 1 and self.getSquare(i,j).getclick() and self.getSquare(i,j) != self.clicklist[0]):
-                    self.clicklist.append(self.getSquare(i,j))
-                    self.moveOrEat()
+                if (self.getSquare(i,j).getclick()):
+                    if (len(self.clicklist) == 0 and self.getSquare(i,j).Piece.type != type.Empty):
+                        self.clicklist.append(self.getSquare(i, j))
+                    if (len(self.clicklist) == 1):
+                        if (self.getSquare(i,j).Piece.side != self.clicklist[0].Piece.side):
+                            if (self.evaluateMovesEngine.evaluateMove(self.clicklist[0], self.getSquare(i,j))):
+                                self.clicklist.append(self.getSquare(i,j))
+                                self.walkOrEat()
+                                self.clicklist.clear()
+                        else:
+                            self.clicklist.clear()
+                            self.clicklist.append(self.getSquare(i,j))
 
-    def moveOrEat(self):
+    def walkOrEat(self):
         square1 = self.clicklist[0]
         square2 = self.clicklist[1]
-        if (square1.Piece.type != square2.Piece.type and square1.Piece.type != type.Empty and square2.Piece.type != type.Empty):
-            print(square1.Piece.type.value, "eat", square2.Piece.type.value, "at", self.toNotation(self.findIJSquare(square2)))
-        else:
-            print(square1.Piece.type.value, "to", self.toNotation(self.findIJSquare(square2)))
         piece1 = square1.Piece
         piece2 = square2.Piece
         location1 = piece1.getlocation()
         location2 = piece2.getlocation()
+        if (square1.Piece.type != square2.Piece.type and square1.Piece.type != type.Empty and square2.Piece.type != type.Empty):
+            print(square1.Piece.type.value, "eat", square2.Piece.type.value, "at", self.toNotation(self.findIJSquare(square2)))
+        else:
+            print(square1.Piece.type.value, "to", self.toNotation(self.findIJSquare(square2)))
+
         self.doAnimation(location1,location2,square1,square2,piece1)
 
         (i,j) = self.findIJSquare(square1)
@@ -143,14 +153,12 @@ class Board:
         (i,j) = self.findIJSquare(square2)
         self.getSquare(i,j).addPieces(piece1)
 
-
     def findIJSquare(self,aSquare):
         for i in range(8):
             for j in range(8):
                 if(self.getSquare(i,j) == aSquare):
                     return (i,j)
         return False
-
 
     def doAnimation(self,firstlocation,secondlocation,square1,square2,myPiece):
         firstx = firstlocation[0]
@@ -174,7 +182,6 @@ class Board:
             self.screen.blit(myPiece.image, (firstx + movementx, firsty + movementy))
             pygame.display.update()
 
-        self.clicklist.clear()
     def toNotation(self,pos):
         alphabetlist = ['A','B','C','D','E','F','G','H']
         return alphabetlist[pos[1]]+str(abs(pos[0]-8))
