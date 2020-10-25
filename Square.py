@@ -1,8 +1,9 @@
 import pygame
-from ChessPiece import ChessPieces
+from ChessPiece import ChessPieces,EmptyPiece
 from type import type
 from side import side
 from Color import yellow,orange
+
 class Square:
     def __init__(self,x,y,w,h,ic):
         self.x = x
@@ -12,7 +13,8 @@ class Square:
         self.color = ic
         self.chosen = False
         self.click = False
-        self.Piece = ChessPieces('Assets\Pieces\empty.png', (0,0),type.Empty,None,side.noside)
+        self.piecelocation = None
+        self.Piece = EmptyPiece
     def choose(self):
         mouse = pygame.mouse.get_pos()
         if (self.x + self.w > mouse[0] > self.x and self.y + self.h > mouse[1] > self.y):
@@ -34,7 +36,10 @@ class Square:
             else:
                 return False
     def addPieces(self,Piece):
+        if (self.piecelocation == None):
+            self.piecelocation = Piece.getlocation() # add the first location (the start location to the square)
         self.Piece = Piece
+        Piece.addlocation(self.piecelocation)
 
     def drawSquare(self,screen,select):
         if (select):

@@ -30,3 +30,16 @@ class EvaluateMovesEngine:
             return self.QueenMovesHandler.evaluateMove(firstSquare,secondSquare)
         elif (firstSquare.Piece.type == type.KingW or firstSquare.Piece.type == type.KingB):
             return self.KingMovesHandler.evaluateMove(firstSquare,secondSquare)
+    def getPossibleWalks(self,firstSquare):
+        if (firstSquare.Piece.type == type.PawnW or firstSquare.Piece.type == type.PawnB):
+            return self.PawnMovesHandler.findAllPossibleWalks(firstSquare)
+        elif (firstSquare.Piece.type == type.KnightW or firstSquare.Piece.type == type.KnightB):
+            return self.KnightMovesHandler.findAllPossibleWalks(firstSquare)
+        elif (firstSquare.Piece.type == type.BishopW or firstSquare.Piece.type == type.BishopB):
+            return self.BishopMovesHandler.findAllPossibleWalks(firstSquare)
+        elif (firstSquare.Piece.type == type.RookW or firstSquare.Piece.type == type.RookB):
+            return self.RookMovesHandler.findAllPossibleWalks(firstSquare)
+        elif (firstSquare.Piece.type == type.QueenW or firstSquare.Piece.type == type.QueenB):
+            return self.QueenMovesHandler.findAllPossibleWalks(firstSquare)
+        elif (firstSquare.Piece.type == type.KingW or firstSquare.Piece.type == type.KingB):
+            return self.KingMovesHandler.findAllPossibleWalks(firstSquare)

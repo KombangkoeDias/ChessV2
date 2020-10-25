@@ -1,10 +1,11 @@
 import pygame
-from Color import lightSquare,darkSquare
+from Color import lightSquare,darkSquare,green
 from type import type
 from side import side
 from Square import Square
 from ChessPiece import ChessPieces
 from EvaluateMovesEngine import EvaluateMovesEngine
+from Moves import Moves
 
 class Board:
     def __init__(self,screen):
@@ -14,6 +15,10 @@ class Board:
         self.screen = screen # the screen passed from UI.py
         self.InitializeBoard() # call to set up the board
         self.evaluateMovesEngine = EvaluateMovesEngine(self)
+        self.possibleWalks = list()
+        self.possibleEats = list()
+        self.moves = list()
+
     def InitializeBoard(self):
         """ return the initialized board as SquareList"""
         self.Squarelist = list() # make it a list
@@ -112,7 +117,8 @@ class Board:
                     self.getSquare(i,j).drawSquare(self.screen,False)
                 if (self.getSquare(i,j).Piece.type != type.Empty):
                     self.getSquare(i,j).Piece.drawPieces(self.screen,self.getSquare(i,j))
-
+        for walkSquare in self.possibleWalks:
+            pygame.draw.circle(self.screen, green, (walkSquare.x + 35, walkSquare.y + 35), 7)
     def getSquare(self,i,j):
         """ return squares at position (i,j) """
         return self.Squarelist[i][j]
@@ -124,15 +130,24 @@ class Board:
                 if (self.getSquare(i,j).getclick()):
                     if (len(self.clicklist) == 0 and self.getSquare(i,j).Piece.type != type.Empty):
                         self.clicklist.append(self.getSquare(i, j))
+                        self.possibleWalks = self.evaluateMovesEngine.getPossibleWalks(self.getSquare(i,j))
+
                     if (len(self.clicklist) == 1):
                         if (self.getSquare(i,j).Piece.side != self.clicklist[0].Piece.side):
                             if (self.evaluateMovesEngine.evaluateMove(self.clicklist[0], self.getSquare(i,j))):
                                 self.clicklist.append(self.getSquare(i,j))
+                                # clear these two lists(walklist,eatlist) before move for aesthetic effect
+                                self.possibleWalks.clear()  # after a move we clear the walklist
+                                self.possibleEats.clear()  # same
                                 self.walkOrEat()
                                 self.clicklist.clear()
+
+
                         else:
                             self.clicklist.clear()
                             self.clicklist.append(self.getSquare(i,j))
+                            self.possibleWalks.clear() # change chosen square we clear the walklist as well
+                            self.possibleWalks = self.evaluateMovesEngine.getPossibleWalks(self.getSquare(i, j)) # and recalculate
 
     def walkOrEat(self):
         square1 = self.clicklist[0]
@@ -145,6 +160,8 @@ class Board:
             print(square1.Piece.type.value, "eat", square2.Piece.type.value, "at", self.toNotation(self.findIJSquare(square2)))
         else:
             print(square1.Piece.type.value, "to", self.toNotation(self.findIJSquare(square2)))
+        move = Moves(square1, piece1, square2, piece2)
+        self.moves.append(move) # add the move to moves list
 
         self.doAnimation(location1,location2,square1,square2,piece1) # doAnimation function gradually updates location of piece1
 
@@ -170,6 +187,8 @@ class Board:
         differencex = (secondj - firstj) * 70
         differencey = (secondi - firsti) * 70
 
+
+
         for i in range(70):
             movementx = differencex / 70 * i
             movementy = differencey / 70 * i
@@ -185,3 +204,27 @@ class Board:
     def toNotation(self,pos):
         alphabetlist = ['A','B','C','D','E','F','G','H']
         return alphabetlist[pos[1]]+str(abs(pos[0]-8))
+
+    def reverseMoves(self):
+        if(len(self.moves) > 0):
+            # clear these three lists whenever going back
+            self.clicklist.clear()
+            self.possibleWalks.clear()
+            self.possibleEats.clear()
+
+            lastMove = self.moves[-1]
+            square1 = lastMove.firstSquare
+            square2 = lastMove.secondSquare
+            piece1 = lastMove.firstPiece
+            piece2 = lastMove.secondPiece
+            square1 = square1[0] # somehow the real square is in lastMove.firstSquare[0] and lastMove.firstSquare is a tuple of one element
+            square2 = square2[0] # and the same for these two but not for piece 2 ??? how strange is that
+            piece1 = piece1[0]
+            location1 = square1.piecelocation
+            location2 = square2.piecelocation
+
+            self.doAnimation(location2,location1,square2,square1,piece1)
+
+            square1.addPieces(piece1)
+            square2.addPieces(piece2)
+            self.moves.pop(-1)

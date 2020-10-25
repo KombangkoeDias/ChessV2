@@ -6,3 +6,5 @@ class RookMovesHandler:
     def evaluateMove(self,firstSquare,secondSquare):
         print("evaluate rook move")
         return True
+    def findAllPossibleWalks(self,firstSquare):
+        return list()

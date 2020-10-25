@@ -6,3 +6,5 @@ class KnightMovesHandler:
     def evaluateMove(self,firstSquare,secondSquare):
         print("evaluate knight move")
         return True
+    def findAllPossibleWalks(self,firstSquare):
+        return list()

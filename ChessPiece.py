@@ -1,5 +1,8 @@
 import pygame
 import enum
+from side import side
+from type import type
+
 class ChessPieces:
     def __init__(self, image_file, location,type,order,side):
         pygame.sprite.Sprite.__init__(self)
@@ -17,3 +20,5 @@ class ChessPieces:
         screen.blit(Square.Piece.image, Square.Piece.rect)
     def getlocation(self):
         return (self.rect.left,self.rect.top)
+
+EmptyPiece = ChessPieces('Assets\Pieces\empty.png', (0,0),type.Empty,None,side.noside)

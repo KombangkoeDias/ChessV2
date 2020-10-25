@@ -6,3 +6,5 @@ class QueenMovesHandler:
     def evaluateMove(self,firstSquare,secondSquare):
         print("evaluate queen move")
         return True
+    def findAllPossibleWalks(self,firstSquare):
+        return list()
