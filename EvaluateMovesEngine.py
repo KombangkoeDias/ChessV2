@@ -18,18 +18,12 @@ class EvaluateMovesEngine:
         self.KingMovesHandler = KingMovesHandler(chessboard)
         print("The Evaluate-moves engine is created")
     def evaluateMove(self,firstSquare,secondSquare):
-        if (firstSquare.Piece.type == type.PawnW or firstSquare.Piece.type == type.PawnB):
-            return self.PawnMovesHandler.evaluateMove(firstSquare,secondSquare)
-        elif (firstSquare.Piece.type == type.KnightW or firstSquare.Piece.type == type.KnightB):
-            return self.KnightMovesHandler.evaluateMove(firstSquare,secondSquare)
-        elif (firstSquare.Piece.type == type.BishopW or firstSquare.Piece.type == type.BishopB):
-            return self.BishopMovesHandler.evaluateMove(firstSquare,secondSquare)
-        elif (firstSquare.Piece.type == type.RookW or firstSquare.Piece.type == type.RookB):
-            return self.RookMovesHandler.evaluateMove(firstSquare,secondSquare)
-        elif (firstSquare.Piece.type == type.QueenW or firstSquare.Piece.type == type.QueenB):
-            return self.QueenMovesHandler.evaluateMove(firstSquare,secondSquare)
-        elif (firstSquare.Piece.type == type.KingW or firstSquare.Piece.type == type.KingB):
-            return self.KingMovesHandler.evaluateMove(firstSquare,secondSquare)
+        possiblewalks = self.getPossibleWalks(firstSquare)
+        possibleeats = self.getPossibleEats(firstSquare)
+        if (secondSquare in possiblewalks or secondSquare in possibleeats):
+            return True
+        else:
+            return False
     def getPossibleWalks(self,firstSquare):
         if (firstSquare.Piece.type == type.PawnW or firstSquare.Piece.type == type.PawnB):
             return self.PawnMovesHandler.findAllPossibleWalks(firstSquare)
@@ -43,3 +37,16 @@ class EvaluateMovesEngine:
             return self.QueenMovesHandler.findAllPossibleWalks(firstSquare)
         elif (firstSquare.Piece.type == type.KingW or firstSquare.Piece.type == type.KingB):
             return self.KingMovesHandler.findAllPossibleWalks(firstSquare)
+    def getPossibleEats(self,firstSquare):
+        if (firstSquare.Piece.type == type.PawnW or firstSquare.Piece.type == type.PawnB):
+            return self.PawnMovesHandler.findAllPossibleEats(firstSquare)
+        elif (firstSquare.Piece.type == type.KnightW or firstSquare.Piece.type == type.KnightB):
+            return self.KnightMovesHandler.findAllPossibleEats(firstSquare)
+        elif (firstSquare.Piece.type == type.BishopW or firstSquare.Piece.type == type.BishopB):
+            return self.BishopMovesHandler.findAllPossibleEats(firstSquare)
+        elif (firstSquare.Piece.type == type.RookW or firstSquare.Piece.type == type.RookB):
+            return self.RookMovesHandler.findAllPossibleEats(firstSquare)
+        elif (firstSquare.Piece.type == type.QueenW or firstSquare.Piece.type == type.QueenB):
+            return self.QueenMovesHandler.findAllPossibleEats(firstSquare)
+        elif (firstSquare.Piece.type == type.KingW or firstSquare.Piece.type == type.KingB):
+            return self.KingMovesHandler.findAllPossibleEats(firstSquare)

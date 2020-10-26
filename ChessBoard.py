@@ -112,13 +112,18 @@ class Board:
         for i in range(8):
             for j in range(8):
                 if (len(self.clicklist) > 0 and (i,j) == self.findIJSquare(self.clicklist[0])):
-                    self.getSquare(i, j).drawSquare(self.screen,True)
+                    self.getSquare(i, j).drawSquare(self.screen,True,False)
                 else:
-                    self.getSquare(i,j).drawSquare(self.screen,False)
-                if (self.getSquare(i,j).Piece.type != type.Empty):
-                    self.getSquare(i,j).Piece.drawPieces(self.screen,self.getSquare(i,j))
-        for walkSquare in self.possibleWalks:
+                    self.getSquare(i,j).drawSquare(self.screen,False,False)
+
+        for walkSquare in self.possibleWalks: # for possible walks draw green dots.
             pygame.draw.circle(self.screen, green, (walkSquare.x + 35, walkSquare.y + 35), 7)
+        for eatSquare in self.possibleEats:
+            eatSquare.drawSquare(self.screen,False,True)
+        for i in range(8):
+            for j in range(8):
+                if (self.getSquare(i,j).Piece.type != type.Empty): # pieces are drawn after all squares are drawn
+                    self.getSquare(i,j).Piece.drawPieces(self.screen,self.getSquare(i,j))
     def getSquare(self,i,j):
         """ return squares at position (i,j) """
         return self.Squarelist[i][j]
@@ -131,6 +136,7 @@ class Board:
                     if (len(self.clicklist) == 0 and self.getSquare(i,j).Piece.type != type.Empty):
                         self.clicklist.append(self.getSquare(i, j))
                         self.possibleWalks = self.evaluateMovesEngine.getPossibleWalks(self.getSquare(i,j))
+                        self.possibleEats = self.evaluateMovesEngine.getPossibleEats(self.getSquare(i,j))
 
                     if (len(self.clicklist) == 1):
                         if (self.getSquare(i,j).Piece.side != self.clicklist[0].Piece.side):
@@ -147,7 +153,9 @@ class Board:
                             self.clicklist.clear()
                             self.clicklist.append(self.getSquare(i,j))
                             self.possibleWalks.clear() # change chosen square we clear the walklist as well
+                            self.possibleEats.clear()
                             self.possibleWalks = self.evaluateMovesEngine.getPossibleWalks(self.getSquare(i, j)) # and recalculate
+                            self.possibleEats = self.evaluateMovesEngine.getPossibleEats(self.getSquare(i, j))
 
     def walkOrEat(self):
         square1 = self.clicklist[0]
@@ -170,6 +178,12 @@ class Board:
         (i,j) = self.findIJSquare(square2)
         self.getSquare(i,j).addPieces(piece1)
 
+    def checkIJInSquare(self,i,j):
+        if 0 <= i and i <= 7 and 0 <= j and j <= 7:
+            return True
+        else:
+            return False
+
     def findIJSquare(self,aSquare):
         for i in range(8):
             for j in range(8):
@@ -189,9 +203,9 @@ class Board:
 
 
 
-        for i in range(70):
-            movementx = differencex / 70 * i
-            movementy = differencey / 70 * i
+        for i in range(50):
+            movementx = differencex / 50 * i
+            movementy = differencey / 50 * i
             pygame.time.delay(1)
             myPiece.addlocation((firstx + movementx, firsty + movementy))
             self.drawBoardAndPieces()
