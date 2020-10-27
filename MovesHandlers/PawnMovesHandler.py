@@ -1,5 +1,6 @@
 from type import type
 from side import side
+from MovesHandlers.evaluateCheck import EvaluateCheck
 
 class PawnMovesHandler:
     def __init__(self,chessboard):
@@ -54,7 +55,11 @@ class PawnMovesHandler:
                 right_eat_square = self.chessboard.getSquare(row + 1, col + 1)
                 if (right_eat_square.Piece.side == side.whiteside): # and if that square's piece is opponent's add it to eat list
                     self.possibleEats.append(right_eat_square)
+        self.findEnPassant() # add more to possibleEats for En Passant
         return self.possibleEats
+    def findEnPassant(self,firstSquare):
+        # TODO creates En Passant function
+        pass
 
 
 

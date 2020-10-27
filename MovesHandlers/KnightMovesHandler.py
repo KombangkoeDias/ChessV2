@@ -1,5 +1,6 @@
 from side import side
 from type import type
+from MovesHandlers.evaluateCheck import EvaluateCheck
 
 class KnightMovesHandler:
     def __init__(self,chessboard):

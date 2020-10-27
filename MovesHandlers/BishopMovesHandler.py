@@ -1,4 +1,5 @@
 from type import type
+from MovesHandlers.evaluateCheck import EvaluateCheck
 
 class BishopMovesHandler:
     def __init__(self,chessboard):
