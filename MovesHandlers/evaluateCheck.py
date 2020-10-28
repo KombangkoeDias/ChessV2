@@ -26,7 +26,7 @@ class EvaluateCheck: # it will check the walks or eats and filter them so that i
         return self.filter(eatSquares,firstSquare)
     def filter(self,Squares,firstSquare):
         """ filter the moves so that it won't trigger check to its own side which is forbidden by the rule"""
-        poplist = list()
+        resultlist = list() # the result list
         for i in range(len(Squares)):
             currentSide = firstSquare.Piece.side
             firstPiece = firstSquare.Piece
@@ -35,22 +35,16 @@ class EvaluateCheck: # it will check the walks or eats and filter them so that i
             # move without animation
             self.chessboard.walkOrEatWithoutAnimation(firstSquare,Squares[i])
 
-            # we use poplist to note which one we will choose and not choose to add into resultlist
-            if(self.checkCheck(currentSide)): # if the move makes its own side checked then pop it (1)
+            # we will choose and not choose to add into resultlist
+            if(self.checkCheck(currentSide)): # if the move makes its own side checked then not include it
                 print("remove", self.chessboard.findIJSquare(Squares[i]))
-                poplist.append(1)
-            else: # if not marked it 0 to be add into resultlist.
-                poplist.append(0)
-
+            else: # if not it will be add into resultlist.
+                resultlist.append(Squares[i])
             # then move back
             firstSquare.addPieces(firstPiece)
             Squares[i].addPieces(secondPiece)
-
-        resultlist = list() # the result list
-        for i in range(len(poplist)):
-            if(poplist[i] == 0): # if it's not pop (0) then add it to result list.
-                resultlist.append(Squares[i])
         return resultlist
+
     def detect_CheckMate(self):
         """ detect if the each side has been checked mate. return side object"""
         # TODO Create CheckMate detecting function
