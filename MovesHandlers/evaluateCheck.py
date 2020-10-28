@@ -53,4 +53,5 @@ class EvaluateCheck: # it will check the walks or eats and filter them so that i
         return resultlist
     def detect_CheckMate(self):
         """ detect if the each side has been checked mate. return side object"""
+        # TODO Create CheckMate detecting function
         pass
