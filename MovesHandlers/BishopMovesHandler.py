@@ -1,5 +1,4 @@
 from type import type
-from MovesHandlers.evaluateCheck import EvaluateCheck
 
 class BishopMovesHandler:
     def __init__(self,chessboard):
@@ -8,6 +7,7 @@ class BishopMovesHandler:
         self.possibleWalks = list()
 
     def findAllPossibleWalks(self,firstSquare):
+        self.possibleWalks.clear() # clear the results before evaluating
         (row,col) = self.chessboard.findIJSquare(firstSquare)
         northEast = (row-1,col+1)
         northWest = (row-1,col-1)
@@ -31,6 +31,7 @@ class BishopMovesHandler:
             southWest = (southWest[0] + 1, southWest[1] - 1)
         return self.possibleWalks
     def findAllPossibleEats(self,firstSquare):
+        self.possibleEats.clear() # clear the results before evaluating
         (row, col) = self.chessboard.findIJSquare(firstSquare)
         northEast = (row - 1, col + 1)
         northWest = (row - 1, col - 1)

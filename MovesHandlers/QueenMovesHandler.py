@@ -1,6 +1,5 @@
 from type import type
 from side import side
-from MovesHandlers.evaluateCheck import EvaluateCheck
 
 class QueenMovesHandler:
     def __init__(self,chessboard):
@@ -10,6 +9,7 @@ class QueenMovesHandler:
     def findAllPossibleWalks(self,firstSquare):
         # combine the two codes of bishop and rook to get queen
         # the same code for bishop
+        self.possibleWalks.clear() # clear the list first
         (row, col) = self.chessboard.findIJSquare(firstSquare)
         northEast = (row - 1, col + 1)
         northWest = (row - 1, col - 1)
@@ -54,6 +54,7 @@ class QueenMovesHandler:
             bottom = (bottom[0] + 1, bottom[1])
         return self.possibleWalks
     def findAllPossibleEats(self,firstSquare):
+        self.possibleEats.clear() # clear the list first
         (row, col) = self.chessboard.findIJSquare(firstSquare)
         # combine the two codes of bishop and rook to get queen
         # the same code for bishop

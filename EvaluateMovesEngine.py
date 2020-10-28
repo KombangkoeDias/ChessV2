@@ -24,6 +24,19 @@ class EvaluateMovesEngine:
             return True
         else:
             return False
+    def clearResult(self):
+        self.PawnMovesHandler.possibleWalks.clear()
+        self.PawnMovesHandler.possibleEats.clear()
+        self.KnightMovesHandler.possibleWalks.clear()
+        self.KnightMovesHandler.possibleEats.clear()
+        self.BishopMovesHandler.possibleWalks.clear()
+        self.BishopMovesHandler.possibleEats.clear()
+        self.RookMovesHandler.possibleWalks.clear()
+        self.RookMovesHandler.possibleEats.clear()
+        self.QueenMovesHandler.possibleWalks.clear()
+        self.QueenMovesHandler.possibleEats.clear()
+        self.KingMovesHandler.possibleWalks.clear()
+        self.KingMovesHandler.possibleEats.clear()
     def getPossibleWalks(self,firstSquare):
         if (firstSquare.Piece.type == type.PawnW or firstSquare.Piece.type == type.PawnB):
             return self.PawnMovesHandler.findAllPossibleWalks(firstSquare)

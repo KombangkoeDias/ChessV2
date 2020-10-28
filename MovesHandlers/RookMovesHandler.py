@@ -1,6 +1,5 @@
 from type import type
 from side import side
-from MovesHandlers.evaluateCheck import EvaluateCheck
 
 class RookMovesHandler:
     def __init__(self,chessboard):
@@ -9,6 +8,7 @@ class RookMovesHandler:
         self.possibleEats = list()
 
     def findAllPossibleWalks(self,firstSquare):
+        self.possibleWalks.clear() # clear the list first
         (row, col) = self.chessboard.findIJSquare(firstSquare)
         top = (row - 1, col)
         left = (row, col - 1)
@@ -32,6 +32,7 @@ class RookMovesHandler:
             bottom = (bottom[0] + 1, bottom[1])
         return self.possibleWalks
     def findAllPossibleEats(self,firstSquare):
+        self.possibleEats.clear() # clear the list first
         (row, col) = self.chessboard.findIJSquare(firstSquare)
         top = (row - 1, col)
         left = (row, col - 1)

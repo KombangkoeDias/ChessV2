@@ -2,7 +2,7 @@ import pygame
 from ChessPiece import ChessPieces,EmptyPiece
 from type import type
 from side import side
-from Color import yellow,orange,red
+from Color import yellow,orange,red,purple
 
 class Square:
     def __init__(self,x,y,w,h,ic):
@@ -41,9 +41,12 @@ class Square:
         self.Piece = Piece
         Piece.addlocation(self.piecelocation)
 
-    def drawSquare(self,screen,select,eat):
+    def drawSquare(self,screen,select,eat,check):
+        if (check):
+            pygame.draw.rect(screen, purple, (self.x, self.y, self.w, self.h))
+            return
         if (select):
-            pygame.draw.rect(screen,orange , (self.x, self.y, self.w, self.h))
+            pygame.draw.rect(screen, orange, (self.x, self.y, self.w, self.h))
         elif(eat):
             pygame.draw.rect(screen,red, (self.x, self.y, self.w, self.h))
         elif (self.gethover()):

@@ -1,6 +1,5 @@
 from side import side
 from type import type
-from MovesHandlers.evaluateCheck import EvaluateCheck
 
 class KnightMovesHandler:
     def __init__(self,chessboard):
@@ -8,7 +7,7 @@ class KnightMovesHandler:
         self.possibleEats = list()
         self.possibleWalks = list()
     def findAllPossibleWalks(self,firstSquare):
-        self.possibleWalks.clear()
+        self.possibleWalks.clear() # clear the results before evaluating
         (row,col) = self.chessboard.findIJSquare(firstSquare)
         allPossibleMoves = [(row-1,col-2),(row-1,col+2),(row+1,col-2),(row+1,col+2),(row-2,col+1),(row-2,col-1),(row+2,col+1),(row+2,col-1)]
         for move in allPossibleMoves:
@@ -16,7 +15,7 @@ class KnightMovesHandler:
                 self.possibleWalks.append(self.chessboard.getSquare(move[0],move[1]))
         return self.possibleWalks
     def findAllPossibleEats(self,firstSquare):
-        self.possibleEats.clear()
+        self.possibleEats.clear() # clear the results before evaluating
         (row, col) = self.chessboard.findIJSquare(firstSquare)
         allPossibleMoves = [(row - 1, col - 2), (row - 1, col + 2), (row + 1, col - 2), (row + 1, col + 2),
                             (row - 2, col + 1), (row - 2, col - 1), (row + 2, col + 1), (row + 2, col - 1)]

@@ -5,6 +5,7 @@ from side import side
 from Square import Square
 from ChessPiece import ChessPieces
 from EvaluateMovesEngine import EvaluateMovesEngine
+from MovesHandlers.evaluateCheck import EvaluateCheck
 from Moves import Moves
 
 class Board:
@@ -18,6 +19,9 @@ class Board:
         self.possibleWalks = list() # the list to store possible walk squares
         self.possibleEats = list() # the list to store possible eat squares
         self.moves = list() # list to store all the moves taken
+        self.evaluateCheckEngine = EvaluateCheck(self)
+        self.whiteischecked = False
+        self.blackischecked = False
 
     def InitializeBoard(self):
         """ return the initialized board as SquareList"""
@@ -109,17 +113,24 @@ class Board:
         """ draw board and piece when things changes, ( draw squares according to the Squares in Square list, and draw piece
         according to the piece location and image file in Square list)
         """
+
         for i in range(8):
             for j in range(8):
                 if (len(self.clicklist) > 0 and (i,j) == self.findIJSquare(self.clicklist[0])):
-                    self.getSquare(i, j).drawSquare(self.screen,True,False)
+                    self.getSquare(i, j).drawSquare(self.screen,select=True,eat=False,check=False)
+                elif (self.whiteischecked and self.getSquare(i,j).Piece.type == type.KingW):
+                    self.getSquare(i,j).drawSquare(self.screen,select=False,eat=False,check=True) # draw purple squares for king if checked
+                elif (self.blackischecked and self.getSquare(i,j).Piece.type == type.KingB):
+                    self.getSquare(i,j).drawSquare(self.screen,select=False,eat=False,check=True) # draw purple squares for king if checked
                 else:
-                    self.getSquare(i,j).drawSquare(self.screen,False,False)
+                    self.getSquare(i,j).drawSquare(self.screen,select=False,eat=False,check=False)
 
         for walkSquare in self.possibleWalks: # for possible walks draw green dots.
             pygame.draw.circle(self.screen, green, (walkSquare.x + 35, walkSquare.y + 35), 7)
         for eatSquare in self.possibleEats:
-            eatSquare.drawSquare(self.screen,False,True)
+            eatSquare.drawSquare(self.screen,select=False,eat=True,check=False)
+
+
         for i in range(8):
             for j in range(8):
                 if (self.getSquare(i,j).Piece.type != type.Empty): # pieces are drawn after all squares are drawn
@@ -142,11 +153,18 @@ class Board:
                         if (self.getSquare(i,j).Piece.side != self.clicklist[0].Piece.side):
                             if (self.evaluateMovesEngine.evaluateMove(self.clicklist[0], self.getSquare(i,j))):
                                 self.clicklist.append(self.getSquare(i,j))
+
                                 # clear these two lists(walklist,eatlist) before move for aesthetic effect
                                 self.possibleWalks.clear()  # after a move we clear the walklist
                                 self.possibleEats.clear()  # same
                                 self.walkOrEat() # call the function to handle walk or eat moves
                                 self.clicklist.clear() # after handling the walk or eat we clear the clicklist, obviously
+                                self.whiteischecked = self.evaluateCheckEngine.checkCheck(side.whiteside)
+                                self.blackischecked = self.evaluateCheckEngine.checkCheck(side.blackside)
+                                if (self.whiteischecked): # print to notify
+                                    print("white is checked")
+                                elif (self.blackischecked):
+                                    print("black is checked")
 
 
                         else: # in case that the second click is of the same side as the Piece in the first click this is the
@@ -252,3 +270,7 @@ class Board:
             square1.addPieces(piece1) # then really change the position of the pice.
             square2.addPieces(piece2)
             self.moves.pop(-1) # and lastly, remove the last move in the move list.
+
+            # also after moving back check again for check to draw purple squares.
+            self.whiteischecked = self.evaluateCheckEngine.checkCheck(side.whiteside)
+            self.blackischecked = self.evaluateCheckEngine.checkCheck(side.blackside)
