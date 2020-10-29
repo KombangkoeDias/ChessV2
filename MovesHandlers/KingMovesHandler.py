@@ -14,6 +14,7 @@ class KingMovesHandler:
             if (self.chessboard.checkIJInSquare(step[0],step[1]) and self.chessboard.getSquare(step[0],step[1]).Piece.type == type.Empty):
                 self.possibleWalks.append(self.chessboard.getSquare(step[0],step[1]))
         return self.possibleWalks
+
     def findAllPossibleEats(self,firstSquare):
         self.possibleEats.clear() # clear the results before evaluating
         (row, col) = self.chessboard.findIJSquare(firstSquare)
@@ -25,3 +26,8 @@ class KingMovesHandler:
                     self.chessboard.getSquare(step[0],step[1]).Piece.side != firstSquare.Piece.side):
                 self.possibleEats.append(self.chessboard.getSquare(step[0], step[1]))
         return self.possibleEats
+
+    def findCastlingMoves(self,firstSquare):
+        # TODO Find Castling Moves
+        """ This function detect for Castling moves when clicking the king(in firstSquare) """
+        pass
