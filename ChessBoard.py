@@ -276,13 +276,11 @@ class Board:
 
             lastMove = self.moves[-1] # get the last move
             # get the squares and pieces
-            square1 = lastMove.firstSquare
-            square2 = lastMove.secondSquare
-            piece1 = lastMove.firstPiece
-            piece2 = lastMove.secondPiece
-            square1 = square1[0] # somehow the real square is in lastMove.firstSquare[0] and lastMove.firstSquare is a tuple of one element
-            square2 = square2[0] # and the same for these two but not for piece 2 ??? how strange is that
-            piece1 = piece1[0]
+            square1 = lastMove.getFirstSquare()
+            square2 = lastMove.getSecondSquare()
+            piece1 = lastMove.getFirstPiece()
+            piece2 = lastMove.getSecondPiece()
+
             # and location of the two square
             location1 = square1.piecelocation
             location2 = square2.piecelocation

@@ -58,6 +58,14 @@ class PawnMovesHandler:
         return self.possibleEats
     def findEnPassant(self,firstSquare):
         # TODO creates En Passant function
+        if (firstSquare.Piece.side == side.whiteside):
+            if (self.chessboard.findIJSquare(firstSquare)[0] == 3):
+                print("last move", self.chessboard.findIJSquare(self.chessboard.moves[-1].getFirstSquare()),"to",
+                      self.chessboard.findIJSquare(self.chessboard.moves[-1].getSecondSquare()))
+        else:
+            if (self.chessboard.findIJSquare(firstSquare)[0] == 4):
+                print("last move",self.chessboard.findIJSquare(self.chessboard.moves[-1].getFirstSquare()),"to",
+                      self.chessboard.findIJSquare(self.chessboard.moves[-1].getSecondSquare()))
         pass
 
 

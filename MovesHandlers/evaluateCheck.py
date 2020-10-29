@@ -6,7 +6,7 @@ from EvaluateMovesEngine import EvaluateMovesEngine
 class EvaluateCheck: # it will check the walks or eats and filter them so that it won't trigger check to its side.
     def __init__(self,chessboard):
         self.chessboard = chessboard
-        self.evaluateMoveEngine = EvaluateMovesEngine(self.chessboard,self)
+        self.evaluateMoveEngine = EvaluateMovesEngine(self.chessboard,self) # create a new evaluateMoveEngine object so that it won't affect the board's moveEngine
     def checkCheck(self,side):
         """ return True if the side in input is being checked and False if not"""
         for i in range(8):
@@ -14,6 +14,7 @@ class EvaluateCheck: # it will check the walks or eats and filter them so that i
                 currSquare = self.chessboard.getSquare(i,j)
                 if (currSquare.Piece.type != type.Empty and currSquare.Piece.side != side): # if it's not empty and it's opponent
                     # the evaluateMoveEngine handlers will clear all the results before evaluating again so no problem.
+
                     eatSquares = self.evaluateMoveEngine.getPossibleEats(currSquare)
                     for eat in eatSquares:
                         if (side == side.blackside and eat.Piece.type == type.KingB or
