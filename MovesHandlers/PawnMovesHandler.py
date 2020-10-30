@@ -80,6 +80,14 @@ class PawnMovesHandler:
                         and piece.type == type.PawnW):
                     self.possibleEats.append(self.chessboard.getSquare(row + 1, firstlast2)) # so we add the en passant square to the eatlist
 
+    def handlePromotion(self,promotionSquare):
+        """
+        handle promotion from the start of the promotion, stop the game until chosen, and return the chosen promotion choice.
+        :param promotionSquare: The square in which the to-be-promoted pawn is at.
+        :return: the choice user make.
+        """
+        # TODO create UI for promotion and handle clicks
+        pass
 
 
 
