@@ -56,28 +56,29 @@ class PawnMovesHandler:
                     self.possibleEats.append(right_eat_square)
         self.findEnPassant(firstSquare) # add more to possibleEats for En Passant
         return self.possibleEats
-    def findEnPassant(self,firstSquare):
-        # TODO creates En Passant function
-        (row,col) = self.chessboard.findIJSquare(firstSquare)
 
-        if (firstSquare.Piece.side == side.whiteside):
-            if (self.chessboard.findIJSquare(firstSquare)[0] == 3):
+    def findEnPassant(self,firstSquare):
+        """ This function detects en passant possibilities and add it to self.possibleEats """
+        (row,col) = self.chessboard.findIJSquare(firstSquare) # get row and column of the chosen pawn.
+
+        if (firstSquare.Piece.side == side.whiteside): # for white
+            if (self.chessboard.findIJSquare(firstSquare)[0] == 3): # for white side it's only possible when the pawn is at row 3
                 piece = self.chessboard.moves[-1].getFirstPiece()
                 (firstlast1, firstlast2) = self.chessboard.findIJSquare(self.chessboard.moves[-1].getFirstSquare())
                 (secondlast1, secondlast2) = self.chessboard.findIJSquare(self.chessboard.moves[-1].getSecondSquare())
-                print("last move",(firstlast1,firstlast2),"to",(secondlast1,secondlast2))
+                # the condition for the last move is that the opponent adjacent-column pawn is just move 2 steps
                 if (firstlast1 == row-2 and secondlast1 == row and (firstlast2 == col + 1 or firstlast2 == col - 1)
                         and piece.type == type.PawnB):
-                    print("possible enpassant for white")
-        else:
-            if (self.chessboard.findIJSquare(firstSquare)[0] == 4):
+                    self.possibleEats.append(self.chessboard.getSquare(row - 1, firstlast2)) # so we add the en passant square to the eatlist
+        else: # for black
+            if (self.chessboard.findIJSquare(firstSquare)[0] == 4):# for white side it's only possible when the pawn is at row 4
                 piece = self.chessboard.moves[-1].getFirstPiece()
                 (firstlast1, firstlast2) = self.chessboard.findIJSquare(self.chessboard.moves[-1].getFirstSquare())
                 (secondlast1, secondlast2) = self.chessboard.findIJSquare(self.chessboard.moves[-1].getSecondSquare())
-                print("last move", (firstlast1, firstlast2), "to", (secondlast1, secondlast2))
+                # the condition for the last move is that the opponent adjacent-column pawn is just move 2 steps
                 if (firstlast1 == row+2 and secondlast1 == row and (firstlast2 == col + 1 or firstlast2 == col - 1)
                         and piece.type == type.PawnW):
-                    print("possible enpassant for black")
+                    self.possibleEats.append(self.chessboard.getSquare(row + 1, firstlast2)) # so we add the en passant square to the eatlist
 
 
 

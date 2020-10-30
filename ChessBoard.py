@@ -11,7 +11,7 @@ from Moves import Moves
 class Board:
     def __init__(self,screen):
         """ initialize the ChessBoard """
-        self.Squarelist = None # Squarelist will hold the list of rows of Squares.
+        self.Squarelist = list() # Squarelist will hold the list of rows of Squares.
         self.clicklist = list() # clicklist will hold the chosen Square and Destination Square.
         self.screen = screen # the screen passed from UI.py
         self.InitializeBoard() # call to set up the board
@@ -137,7 +137,7 @@ class Board:
                     self.getSquare(i,j).Piece.drawPieces(self.screen,self.getSquare(i,j))
 
     def getSquare(self,i,j):
-        """ return squares at position (i,j) """
+        """ return the square at position (i,j) """
         return self.Squarelist[i][j]
 
     def detectClick(self):
@@ -146,7 +146,6 @@ class Board:
             for j in range(8):
                 if (self.getSquare(i,j).getclick()):
                     if (len(self.clicklist) == 0 and self.getSquare(i,j).Piece.type != type.Empty):
-                        print("click")
                         self.clicklist.append(self.getSquare(i, j))
                         self.possibleWalks = self.evaluateMovesEngine.getFilteredPossibleWalks(self.getSquare(i, j))
 
@@ -159,11 +158,14 @@ class Board:
                             if (self.evaluateMovesEngine.evaluateMove(self.clicklist[0], self.getSquare(i,j))):
                                 self.clicklist.append(self.getSquare(i,j))
 
+                                # for the enpassant to be true the move should be in possibleEats and it should be empty.
+                                enpassant = self.clicklist[1] in self.possibleEats and self.clicklist[1].Piece.type == type.Empty
+
                                 # clear these two lists(walklist,eatlist) before move for aesthetic effect
                                 self.possibleWalks.clear()  # after a move we clear the walklist
                                 self.possibleEats.clear()  # same
-                                #self.walkOrEat() # call the function to handle walk or eat moves
-                                self.walkOrEat()
+                                # call the function to handle walk or eat moves
+                                self.walkOrEat(enpassant)
                                 self.clicklist.clear() # after handling the walk or eat we clear the clicklist, obviously
 
                                 # in every moves we need to check if there is checking in the board for both black and white.
@@ -183,9 +185,13 @@ class Board:
                             self.possibleEats.clear() # also clear all the possible walks and eats before evaluating the new chosen square.
                             self.possibleWalks = self.evaluateMovesEngine.getFilteredPossibleWalks(self.getSquare(i, j))# and recalculate
                             self.possibleEats = self.evaluateMovesEngine.getFilteredPossibleEats(self.getSquare(i, j))
-                            print("click2")
 
-    def walkOrEat(self): # this function handle the walk or eat moves
+    def walkOrEat(self,enpassant):
+        """
+        this function handle the walk or eat moves
+        :param enpassant: the condition if the move is an en passant move
+        :return: None
+        """
         square1 = self.clicklist[0] # first we get first square and second square from the clicklist
         square2 = self.clicklist[1]
         piece1 = square1.Piece # then the first and second piece
@@ -198,7 +204,7 @@ class Board:
         else:
             print(square1.Piece.type.value, "to", self.toNotation(self.findIJSquare(square2)))
         # create an instance of Moves class to track move and pieces
-        move = Moves(square1, piece1, square2, piece2)
+        move = Moves(square1, piece1, square2, piece2, enpassant)
         self.moves.append(move) # add the move to moves list
 
         self.doAnimation(location1,location2,square1,square2,piece1) # doAnimation function gradually updates location of piece1
@@ -207,6 +213,16 @@ class Board:
         square1.addPieces(ChessPieces('Assets\Pieces\empty.png', location1, type.Empty, None, side.noside))
 
         square2.addPieces(piece1)
+
+        if (enpassant): # if en passant, remove the eaten piece.
+            walkSquare = self.clicklist[1]
+            (walk1,walk2) = self.findIJSquare(walkSquare)
+            if (piece1.side == side.whiteside):
+                eatSquare = self.getSquare(walk1 + 1, walk2)
+            else:
+                eatSquare = self.getSquare(walk1 - 1, walk2)
+            eatSquare.addPieces(ChessPieces('Assets\Pieces\empty.png', eatSquare.Piece.getlocation(), type.Empty, None, side.noside))
+            print("en passant move")
 
     def walkOrEatWithoutAnimation(self,firstSquare,secondSquare):
         """ move/eat piece from firstSquare to secondSquare
@@ -289,11 +305,24 @@ class Board:
 
             square1.addPieces(piece1) # then really change the position of the pice.
             square2.addPieces(piece2)
+
+            if (lastMove.enPassant):
+                (walk1, walk2) = self.findIJSquare(square2)
+                if (piece1.side == side.whiteside):
+                    self.getSquare(walk1 + 1, walk2).addPieces(
+                        ChessPieces('Assets/Pieces/blackPawn.png', self.getSquare(walk1 + 1, walk2).piecelocation,
+                                    type.PawnB, walk2, side.blackside))
+                if (piece1.side == side.blackside):
+                    self.getSquare(walk1 - 1, walk2).addPieces(
+                        ChessPieces('Assets\Pieces\whitePawn.png', self.getSquare(walk1 - 1, walk2).piecelocation,
+                                    type.PawnW, walk2, side.whiteside))
+
             self.moves.pop(-1) # and lastly, remove the last move in the move list.
 
             # also after moving back check again for check to draw purple squares.
             self.whiteischecked = self.evaluateCheckEngine.checkCheck(side.whiteside)
             self.blackischecked = self.evaluateCheckEngine.checkCheck(side.blackside)
+
 
 
     def printBoard(self):
