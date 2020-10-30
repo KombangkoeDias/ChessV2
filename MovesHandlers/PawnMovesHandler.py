@@ -58,15 +58,27 @@ class PawnMovesHandler:
         return self.possibleEats
     def findEnPassant(self,firstSquare):
         # TODO creates En Passant function
+        (row,col) = self.chessboard.findIJSquare(firstSquare)
+
         if (firstSquare.Piece.side == side.whiteside):
             if (self.chessboard.findIJSquare(firstSquare)[0] == 3):
-                print("last move", self.chessboard.findIJSquare(self.chessboard.moves[-1].getFirstSquare()),"to",
-                      self.chessboard.findIJSquare(self.chessboard.moves[-1].getSecondSquare()))
+                piece = self.chessboard.moves[-1].getFirstPiece()
+                (firstlast1, firstlast2) = self.chessboard.findIJSquare(self.chessboard.moves[-1].getFirstSquare())
+                (secondlast1, secondlast2) = self.chessboard.findIJSquare(self.chessboard.moves[-1].getSecondSquare())
+                print("last move",(firstlast1,firstlast2),"to",(secondlast1,secondlast2))
+                if (firstlast1 == row-2 and secondlast1 == row and (firstlast2 == col + 1 or firstlast2 == col - 1)
+                        and piece.type == type.PawnB):
+                    print("possible enpassant for white")
         else:
             if (self.chessboard.findIJSquare(firstSquare)[0] == 4):
-                print("last move",self.chessboard.findIJSquare(self.chessboard.moves[-1].getFirstSquare()),"to",
-                      self.chessboard.findIJSquare(self.chessboard.moves[-1].getSecondSquare()))
-        pass
+                piece = self.chessboard.moves[-1].getFirstPiece()
+                (firstlast1, firstlast2) = self.chessboard.findIJSquare(self.chessboard.moves[-1].getFirstSquare())
+                (secondlast1, secondlast2) = self.chessboard.findIJSquare(self.chessboard.moves[-1].getSecondSquare())
+                print("last move", (firstlast1, firstlast2), "to", (secondlast1, secondlast2))
+                if (firstlast1 == row+2 and secondlast1 == row and (firstlast2 == col + 1 or firstlast2 == col - 1)
+                        and piece.type == type.PawnW):
+                    print("possible enpassant for black")
+
 
 
 
