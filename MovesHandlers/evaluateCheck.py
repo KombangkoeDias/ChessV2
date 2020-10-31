@@ -28,25 +28,42 @@ class EvaluateCheck: # it will check the walks or eats and filter them so that i
     def filter(self,Squares,firstSquare):
         """ filter the moves so that it won't trigger check to its own side which is forbidden by the rule"""
         resultlist = list() # the result list
-        for i in range(len(Squares)):
-            currentSide = firstSquare.Piece.side
-            firstPiece = firstSquare.Piece
-            secondPiece = Squares[i].Piece
+        if(len(Squares) > 0):
+            for i in range(len(Squares)):
+                currentSide = firstSquare.Piece.side
+                firstPiece = firstSquare.Piece
+                secondPiece = Squares[i].Piece
 
-            # move without animation
-            self.chessboard.walkOrEatWithoutAnimation(firstSquare,Squares[i])
+                # move without animation
+                self.chessboard.walkOrEatWithoutAnimation(firstSquare,Squares[i])
 
-            # we will choose and not choose to add into resultlist
-            if(self.checkCheck(currentSide)): # if the move makes its own side checked then not include it
-                print("remove", self.chessboard.findIJSquare(Squares[i]))
-            else: # if not it will be add into resultlist.
-                resultlist.append(Squares[i])
-            # then move back
-            firstSquare.addPieces(firstPiece)
-            Squares[i].addPieces(secondPiece)
+                # we will choose and not choose to add into resultlist
+                if(self.checkCheck(currentSide)): # if the move makes its own side checked then not include it
+                    print("remove", self.chessboard.findIJSquare(Squares[i]))
+                else: # if not it will be add into resultlist.
+                    resultlist.append(Squares[i])
+                # then move back
+                firstSquare.addPieces(firstPiece)
+                Squares[i].addPieces(secondPiece)
         return resultlist
 
-    def detect_CheckMate(self):
+    def detect_CheckMate(self,side):
         """ detect if the each side has been checked mate. return side object"""
-        # TODO Create CheckMate detecting function
-        pass
+        # TODO fix this.
+        totalMoves = 0
+        for i in range(8):
+            for j in range(8):
+                currSquare = self.chessboard.getSquare(i,j)
+                if (currSquare.Piece.type != type.Empty and currSquare.Piece.side == side):
+                    totalMoves += len(self.evaluateMoveEngine.getFilteredPossibleWalks(currSquare))
+                    totalMoves += len(self.evaluateMoveEngine.getFilteredPossibleEats(currSquare))
+                    if (totalMoves > 0):
+                        return False
+        if (totalMoves == 0):
+            if (side == side.whiteside):
+                print("white is checked mate, black wins")
+            if (side == side.blackside):
+                print("black is checked mate, white wins")
+            return True
+        else:
+            return False

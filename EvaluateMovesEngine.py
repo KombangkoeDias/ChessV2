@@ -17,6 +17,8 @@ class EvaluateMovesEngine:
         self.QueenMovesHandler = QueenMovesHandler(chessboard)
         self.KingMovesHandler = KingMovesHandler(chessboard)
         self.evaluateCheckEngine = evaluateCheckEngine
+        self.handlers = [self.PawnMovesHandler,self.KnightMovesHandler,self.BishopMovesHandler,self.RookMovesHandler,
+                         self.QueenMovesHandler,self.KingMovesHandler]
         print("The Evaluate-moves engine is created")
     def evaluateMove(self,firstSquare,secondSquare):
         possiblewalks = self.getFilteredPossibleWalks(firstSquare)

@@ -175,6 +175,8 @@ class Board:
                                     print("white is checked")
                                 elif (self.blackischecked):
                                     print("black is checked")
+                                #self.evaluateCheckEngine.detect_CheckMate(side.whiteside)
+                                #self.evaluateCheckEngine.detect_CheckMate(side.blackside)
 
 
                         elif (self.getSquare(i,j).Piece != self.clicklist[0].Piece): # in case that the second click is of the same side as the Piece in the first click this is the
