@@ -30,6 +30,7 @@ class EvaluateCheck: # it will check the walks or eats and filter them so that i
         resultlist = list() # the result list
         if(len(Squares) > 0):
             for i in range(len(Squares)):
+                print(len(Squares))
                 currentSide = firstSquare.Piece.side
                 firstPiece = firstSquare.Piece
                 secondPiece = Squares[i].Piece
@@ -50,20 +51,21 @@ class EvaluateCheck: # it will check the walks or eats and filter them so that i
     def detect_CheckMate(self,side):
         """ detect if the each side has been checked mate. return side object"""
         # TODO fix this.
+        # now I get to know that if the check move is eating move and the checking piece can be eaten it will error.
         totalMoves = 0
-        for i in range(8):
-            for j in range(8):
-                currSquare = self.chessboard.getSquare(i,j)
-                if (currSquare.Piece.type != type.Empty and currSquare.Piece.side == side):
-                    totalMoves += len(self.evaluateMoveEngine.getFilteredPossibleWalks(currSquare))
-                    totalMoves += len(self.evaluateMoveEngine.getFilteredPossibleEats(currSquare))
-                    if (totalMoves > 0):
-                        return False
-        if (totalMoves == 0):
-            if (side == side.whiteside):
-                print("white is checked mate, black wins")
-            if (side == side.blackside):
-                print("black is checked mate, white wins")
-            return True
-        else:
-            return False
+        if (self.checkCheck(side)):
+            for i in range(8):
+                for j in range(8):
+                    currSquare = self.chessboard.getSquare(i,j)
+                    if (currSquare.Piece.type != type.Empty and currSquare.Piece.side == side):
+                        if (totalMoves > 0):
+                            return False
+                        totalMoves += len(self.evaluateMoveEngine.getFilteredPossibleWalks(currSquare))
+                        totalMoves += len(self.evaluateMoveEngine.getFilteredPossibleEats(currSquare))
+            if (totalMoves == 0 and self.checkCheck(side)):
+                if (side == side.whiteside ):
+                    print("white is checked mate, black wins")
+                if (side == side.blackside ):
+                    print("black is checked mate, white wins")
+                return True
+        return False
