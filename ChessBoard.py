@@ -15,7 +15,7 @@ class Board:
         self.clicklist = list() # clicklist will hold the chosen Square and Destination Square.
         self.screen = screen # the screen passed from UI.py
         self.InitializeBoard() # call to set up the board
-
+        self.boardActive = True
         self.possibleWalks = list() # the list to store possible walk squares
         self.possibleEats = list() # the list to store possible eat squares
         self.moves = list() # list to store all the moves taken
@@ -142,51 +142,57 @@ class Board:
 
     def detectClick(self):
         """ detect the click in all the squares on the board and append the clicked square to the click list """
-        for i in range(8):
-            for j in range(8):
-                if (self.getSquare(i,j).getclick()):
-                    if (len(self.clicklist) == 0 and self.getSquare(i,j).Piece.type != type.Empty):
-                        self.clicklist.append(self.getSquare(i, j))
-                        self.possibleWalks = self.evaluateMovesEngine.getFilteredPossibleWalks(self.getSquare(i, j))
+        if(self.boardActive):
+            for i in range(8):
+                for j in range(8):
+                    if (self.getSquare(i,j).getclick()):
+                        if (len(self.clicklist) == 0 and self.getSquare(i,j).Piece.type != type.Empty):
+                            self.clicklist.append(self.getSquare(i, j))
+                            self.possibleWalks = self.evaluateMovesEngine.getFilteredPossibleWalks(self.getSquare(i, j))
 
-                        self.possibleEats = self.evaluateMovesEngine.getFilteredPossibleEats(self.getSquare(i,j))
+                            self.possibleEats = self.evaluateMovesEngine.getFilteredPossibleEats(self.getSquare(i,j))
 
-                        for walks in self.possibleWalks:
-                            print(self.findIJSquare(walks))
-                    elif (len(self.clicklist) == 1):
-                        if (self.getSquare(i,j).Piece.side != self.clicklist[0].Piece.side):
-                            if (self.evaluateMovesEngine.evaluateMove(self.clicklist[0], self.getSquare(i,j))):
-                                self.clicklist.append(self.getSquare(i,j))
+                            for walks in self.possibleWalks:
+                                print(self.findIJSquare(walks))
+                        elif (len(self.clicklist) == 1):
+                            if (self.getSquare(i,j).Piece.side != self.clicklist[0].Piece.side):
+                                if (self.evaluateMovesEngine.evaluateMove(self.clicklist[0], self.getSquare(i,j))):
+                                    self.clicklist.append(self.getSquare(i,j))
 
-                                # for the enpassant to be true the move should be in possibleEats and it should be empty.
-                                enpassant = self.clicklist[1] in self.possibleEats and self.clicklist[1].Piece.type == type.Empty
+                                    # for the enpassant to be true the move should be in possibleEats and it should be empty.
+                                    enpassant = self.clicklist[1] in self.possibleEats and self.clicklist[1].Piece.type == type.Empty
 
-                                # clear these two lists(walklist,eatlist) before move for aesthetic effect
-                                self.possibleWalks.clear()  # after a move we clear the walklist
-                                self.possibleEats.clear()  # same
-                                # call the function to handle walk or eat moves
-                                self.walkOrEat(enpassant)
-                                self.clicklist.clear() # after handling the walk or eat we clear the clicklist, obviously
+                                    # clear these two lists(walklist,eatlist) before move for aesthetic effect
+                                    self.possibleWalks.clear()  # after a move we clear the walklist
+                                    self.possibleEats.clear()  # same
+                                    # call the function to handle walk or eat moves
+                                    self.walkOrEat(enpassant)
+                                    self.clicklist.clear() # after handling the walk or eat we clear the clicklist, obviously
 
-                                # in every moves we need to check if there is checking in the board for both black and white.
-                                self.whiteischecked = self.evaluateCheckEngine.checkCheck(side.whiteside)
-                                self.blackischecked = self.evaluateCheckEngine.checkCheck(side.blackside)
-                                if (self.whiteischecked): # print to notify
-                                    print("white is checked")
-                                elif (self.blackischecked):
-                                    print("black is checked")
-                                self.evaluateCheckEngine.detect_CheckMate(side.whiteside)
-                                self.evaluateCheckEngine.detect_CheckMate(side.blackside)
+                                    # in every moves we need to check if there is checking in the board for both black and white.
+                                    self.whiteischecked = self.evaluateCheckEngine.checkCheck(side.whiteside)
+                                    self.blackischecked = self.evaluateCheckEngine.checkCheck(side.blackside)
+                                    if (self.whiteischecked): # print to notify
+                                        print("white is checked")
+                                        if(self.evaluateCheckEngine.detect_CheckMate(side.whiteside)):
+                                            self.boardActive = False
+                                    elif (self.blackischecked):
+                                        print("black is checked")
+                                        if(self.evaluateCheckEngine.detect_CheckMate(side.blackside)):
+                                            self.boardActive = False
 
-
-                        elif (self.getSquare(i,j).Piece != self.clicklist[0].Piece): # in case that the second click is of the same side as the Piece in the first click this is the
-                            # changing chosen Piece case
-                            self.clicklist.clear() # so we clear the clicklist
-                            self.clicklist.append(self.getSquare(i,j)) # and change the first Piece
-                            self.possibleWalks.clear() # change chosen square we clear the walklist as well
-                            self.possibleEats.clear() # also clear all the possible walks and eats before evaluating the new chosen square.
-                            self.possibleWalks = self.evaluateMovesEngine.getFilteredPossibleWalks(self.getSquare(i, j))# and recalculate
-                            self.possibleEats = self.evaluateMovesEngine.getFilteredPossibleEats(self.getSquare(i, j))
+                            elif (self.getSquare(i,j).Piece != self.clicklist[0].Piece): # in case that the second click is of the same side as the Piece in the first click this is the
+                                # changing chosen Piece case
+                                self.clicklist.clear() # so we clear the clicklist
+                                self.clicklist.append(self.getSquare(i,j)) # and change the first Piece
+                                self.possibleWalks.clear() # change chosen square we clear the walklist as well
+                                self.possibleEats.clear() # also clear all the possible walks and eats before evaluating the new chosen square.
+                                self.possibleWalks = self.evaluateMovesEngine.getFilteredPossibleWalks(self.getSquare(i, j))# and recalculate
+                                self.possibleEats = self.evaluateMovesEngine.getFilteredPossibleEats(self.getSquare(i, j))
+        else: # board not active
+            self.clicklist.clear()
+            self.possibleWalks.clear()
+            self.possibleEats.clear()
 
     def walkOrEat(self,enpassant):
         """
@@ -226,18 +232,28 @@ class Board:
             eatSquare.addPieces(ChessPieces('Assets\Pieces\empty.png', eatSquare.Piece.getlocation(), type.Empty, None, side.noside))
             print("en passant move")
 
-    def walkOrEatWithoutAnimation(self,firstSquare,secondSquare):
+    def walkOrEatWithoutAnimation(self,firstSquare,secondSquare,enpassant):
         """ move/eat piece from firstSquare to secondSquare
         or the purpose of doing state space searches and trials to check for checks (in filter function) """
 
         piece1 = firstSquare.Piece  # then the first and second piece
-        piece2 = secondSquare.Piece
+
         location1 = piece1.getlocation()  # and location of them
 
         # just add the empty to the first square and the first piece to the second square.
         firstSquare.addPieces(ChessPieces('Assets\Pieces\empty.png', location1, type.Empty, None, side.noside))
 
         secondSquare.addPieces(piece1)
+
+        # the enpassant need to be handled specifically
+        if (enpassant): # if en passant, remove the eaten piece.
+            walkSquare = secondSquare
+            (walk1,walk2) = self.findIJSquare(walkSquare)
+            if (piece1.side == side.whiteside):
+                eatSquare = self.getSquare(walk1 + 1, walk2)
+            else:
+                eatSquare = self.getSquare(walk1 - 1, walk2)
+            eatSquare.addPieces(ChessPieces('Assets\Pieces\empty.png', eatSquare.Piece.getlocation(), type.Empty, None, side.noside))
 
     def checkIJInSquare(self,i,j):
         """ The function to check if the square at i,j is in the board"""

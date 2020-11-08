@@ -30,28 +30,48 @@ class EvaluateCheck: # it will check the walks or eats and filter them so that i
         resultlist = list() # the result list
         if(len(Squares) > 0):
             for i in range(len(Squares)):
-                print(len(Squares))
+                thisSquare = Squares[i] # somehow the square got lost and needed to be put in a variable here ##fixed!!
                 currentSide = firstSquare.Piece.side
                 firstPiece = firstSquare.Piece
                 secondPiece = Squares[i].Piece
+                (row,col) = self.chessboard.findIJSquare(thisSquare)
+                enpassantSquare = None
+                enpassantPiece = None
 
+                # logic to find enpassant
+                enpassant = (firstSquare.Piece.type == type.PawnW or firstSquare.Piece.type == type.PawnB) and (
+                    thisSquare.Piece.type == type.Empty and self.chessboard.findIJSquare(firstSquare)[1] !=
+                    self.chessboard.findIJSquare(thisSquare)[1]
+                )
+
+                # if enpassant we store the enpassant piece and square in advance.
+                if (enpassant):
+                    if (firstPiece.type == type.PawnB):
+                        enpassantSquare = self.chessboard.getSquare(row-1,col)
+                    elif(firstPiece.type == type.PawnW):
+                        enpassantSquare = self.chessboard.getSquare(row+1,col)
+                    enpassantPiece = enpassantSquare.Piece
                 # move without animation
-                self.chessboard.walkOrEatWithoutAnimation(firstSquare,Squares[i])
+                self.chessboard.walkOrEatWithoutAnimation(firstSquare,Squares[i],enpassant)
 
                 # we will choose and not choose to add into resultlist
                 if(self.checkCheck(currentSide)): # if the move makes its own side checked then not include it
-                    print("remove", self.chessboard.findIJSquare(Squares[i]))
+                    print("remove", self.chessboard.findIJSquare(thisSquare), "of", firstPiece.type)
                 else: # if not it will be add into resultlist.
-                    resultlist.append(Squares[i])
+                    resultlist.append(thisSquare)
+
                 # then move back
+
                 firstSquare.addPieces(firstPiece)
-                Squares[i].addPieces(secondPiece)
+                thisSquare.addPieces(secondPiece)
+                if(enpassant): # and after the move we add the eaten piece in the enpassant process.
+                    enpassantSquare.addPiece(enpassantPiece)
+
         return resultlist
 
     def detect_CheckMate(self,side):
         """ detect if the each side has been checked mate. return side object"""
-        # TODO fix this.
-        # now I get to know that if the check move is eating move and the checking piece can be eaten it will error.
+
         totalMoves = 0
         if (self.checkCheck(side)):
             for i in range(8):
