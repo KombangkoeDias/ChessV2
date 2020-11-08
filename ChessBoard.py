@@ -340,6 +340,7 @@ class Board:
             # also after moving back check again for check to draw purple squares.
             self.whiteischecked = self.evaluateCheckEngine.checkCheck(side.whiteside)
             self.blackischecked = self.evaluateCheckEngine.checkCheck(side.blackside)
+            self.boardActive = True
 
 
 
