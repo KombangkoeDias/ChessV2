@@ -165,13 +165,15 @@ class Board:
                                     # for the enpassant to be true the move should be in possibleEats and it should be empty.
                                     enpassant = self.clicklist[1] in self.possibleEats and self.clicklist[1].Piece.type == type.Empty
 
+                                    self.WhiteKingCastlingHandler.determineMoveEffectOnCastling(self.clicklist[0])
+                                    self.BlackKingCastlingHandler.determineMoveEffectOnCastling(self.clicklist[0])
+                                    # TODO make castling move animation
+
                                     # clear these two lists(walklist,eatlist) before move for aesthetic effect
                                     self.possibleWalks.clear()  # after a move we clear the walklist
                                     self.possibleEats.clear()  # same
 
-                                    self.WhiteKingCastlingHandler.determineMoveEffectOnCastling(self.clicklist[0])
-                                    self.BlackKingCastlingHandler.determineMoveEffectOnCastling(self.clicklist[0])
-                                    #TODO make castling move animation
+
 
                                     # call the function to handle walk or eat moves
                                     self.walkOrEat(enpassant)
