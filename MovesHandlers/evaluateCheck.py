@@ -89,3 +89,13 @@ class EvaluateCheck: # it will check the walks or eats and filter them so that i
                     print("black is checked mate, white wins")
                 return True
         return False
+
+    def detectPassSquareEaten(self,side,aSquare):
+        for i in range(8):
+            for j in range(8):
+                currSquare = self.chessboard.getSquare(i, j)
+                if (currSquare.Piece.type != type.Empty and currSquare.Piece.side != side):
+                    moveSquares = self.evaluateMoveEngine.getFilteredPossibleWalks(currSquare)
+                    if (aSquare in moveSquares):
+                        return True
+        return False

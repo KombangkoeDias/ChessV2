@@ -6,6 +6,7 @@ from Square import Square
 from ChessPiece import ChessPieces
 from EvaluateMovesEngine import EvaluateMovesEngine
 from MovesHandlers.evaluateCheck import EvaluateCheck
+from MovesHandlers.KingMovesHandler import CastlingMovesHandler
 from Moves import Moves
 
 class Board:
@@ -23,6 +24,8 @@ class Board:
         self.evaluateMovesEngine = EvaluateMovesEngine(self,self.evaluateCheckEngine)  # the class that call the handlers to evaluate the moves.
         self.whiteischecked = False
         self.blackischecked = False
+        self.BlackKingCastlingHandler = CastlingMovesHandler(side.blackside,self)
+        self.WhiteKingCastlingHandler = CastlingMovesHandler(side.whiteside,self)
 
     def InitializeBoard(self):
         """ return the initialized board as SquareList"""
@@ -165,6 +168,10 @@ class Board:
                                     # clear these two lists(walklist,eatlist) before move for aesthetic effect
                                     self.possibleWalks.clear()  # after a move we clear the walklist
                                     self.possibleEats.clear()  # same
+
+                                    self.WhiteKingCastlingHandler.determineMoveEffectOnCastling(self.clicklist[0])
+                                    self.BlackKingCastlingHandler.determineMoveEffectOnCastling(self.clicklist[0])
+
                                     # call the function to handle walk or eat moves
                                     self.walkOrEat(enpassant)
                                     self.clicklist.clear() # after handling the walk or eat we clear the clicklist, obviously
@@ -341,8 +348,6 @@ class Board:
             self.whiteischecked = self.evaluateCheckEngine.checkCheck(side.whiteside)
             self.blackischecked = self.evaluateCheckEngine.checkCheck(side.blackside)
             self.boardActive = True
-
-
 
     def printBoard(self):
         """ for debugging purpose """
