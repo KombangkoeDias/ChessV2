@@ -171,6 +171,7 @@ class Board:
 
                                     self.WhiteKingCastlingHandler.determineMoveEffectOnCastling(self.clicklist[0])
                                     self.BlackKingCastlingHandler.determineMoveEffectOnCastling(self.clicklist[0])
+                                    #TODO make castling move animation
 
                                     # call the function to handle walk or eat moves
                                     self.walkOrEat(enpassant)
