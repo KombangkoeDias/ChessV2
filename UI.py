@@ -20,6 +20,7 @@ def start_game():
 
 
     while gamePlay:
+
         ChessBoard.detectClick()
         ChessBoard.drawBoardAndPieces()
         drawBackButton(screen,Width,Height,ChessBoard)

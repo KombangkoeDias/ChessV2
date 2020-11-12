@@ -8,6 +8,7 @@ from EvaluateMovesEngine import EvaluateMovesEngine
 from MovesHandlers.evaluateCheck import EvaluateCheck
 from MovesHandlers.KingMovesHandler import CastlingMovesHandler
 from Moves import Moves
+from castling import castlingtype
 
 class Board:
     def __init__(self,screen):
@@ -162,12 +163,17 @@ class Board:
                                 if (self.evaluateMovesEngine.evaluateMove(self.clicklist[0], self.getSquare(i,j))):
                                     self.clicklist.append(self.getSquare(i,j))
 
+                                    self.WhiteKingCastlingHandler.determineMoveEffectOnCastling(self.clicklist[0])
+                                    self.BlackKingCastlingHandler.determineMoveEffectOnCastling(self.clicklist[0])
+
                                     # for the enpassant to be true the move should be in possibleEats and it should be empty.
                                     enpassant = self.clicklist[1] in self.possibleEats and self.clicklist[1].Piece.type == type.Empty
 
-                                    self.WhiteKingCastlingHandler.determineMoveEffectOnCastling(self.clicklist[0])
-                                    self.BlackKingCastlingHandler.determineMoveEffectOnCastling(self.clicklist[0])
-                                    # TODO make castling move animation
+                                    # for the castling to be true the move should be of king and it shouldn't be adjacent to the original square
+                                    firstRow,firstCol = self.findIJSquare(self.clicklist[0])
+                                    secondRow,secondCol = self.findIJSquare(self.clicklist[1])
+                                    castling = (self.clicklist[0].Piece.type == type.KingW or self.clicklist[0].Piece.type == type.KingB)\
+                                               and abs(secondCol - firstCol) == 2
 
                                     # clear these two lists(walklist,eatlist) before move for aesthetic effect
                                     self.possibleWalks.clear()  # after a move we clear the walklist
@@ -176,7 +182,7 @@ class Board:
 
 
                                     # call the function to handle walk or eat moves
-                                    self.walkOrEat(enpassant)
+                                    self.walkOrEat(enpassant,castling)
                                     self.clicklist.clear() # after handling the walk or eat we clear the clicklist, obviously
 
                                     # in every moves we need to check if there is checking in the board for both black and white.
@@ -204,7 +210,7 @@ class Board:
             self.possibleWalks.clear()
             self.possibleEats.clear()
 
-    def walkOrEat(self,enpassant):
+    def walkOrEat(self,enpassant,castling):
         """
         this function handle the walk or eat moves
         :param enpassant: the condition if the move is an en passant move
@@ -222,8 +228,10 @@ class Board:
         else:
             print(square1.Piece.type.value, "to", self.toNotation(self.findIJSquare(square2)))
         # create an instance of Moves class to track move and pieces
-        move = Moves(square1, piece1, square2, piece2, enpassant)
-        self.moves.append(move) # add the move to moves list
+
+        castlingVal = castlingtype.noCastling
+        move = Moves(square1, piece1, square2, piece2, enpassant,castlingVal)
+
 
         self.doAnimation(location1,location2,square1,square2,piece1) # doAnimation function gradually updates location of piece1
 
@@ -242,6 +250,25 @@ class Board:
             eatSquare.addPieces(ChessPieces('Assets\Pieces\empty.png', eatSquare.Piece.getlocation(), type.Empty, None, side.noside))
             print("en passant move")
 
+        if (castling):
+            print("castling")
+            if(self.getSquare(0,2).Piece.type == type.KingB ):
+                print("black right castling")
+                self.walkOrEatWithoutAnimation(self.getSquare(0,0),self.getSquare(0,3),enpassant) # actually enpassant is always false in here
+                move.castling = castlingtype.blackRightCastling
+            elif (self.getSquare(0,6).Piece.type == type.KingB ):
+                self.walkOrEatWithoutAnimation(self.getSquare(0,7),self.getSquare(0,5),enpassant) # actually enpassant is always false in here
+                print("black left castling")
+                move.castling = castlingtype.blackLeftCastling
+            elif (self.getSquare(7,2).Piece.type == type.KingW):
+                self.walkOrEatWithoutAnimation(self.getSquare(7,0),self.getSquare(7,3),enpassant) # actually enpassant is always false in here
+                print("white left castling")
+                move.castling = castlingtype.whiteLeftCastling
+            elif (self.getSquare(7,6).Piece.type == type.KingW):
+                self.walkOrEatWithoutAnimation(self.getSquare(7,7),self.getSquare(7,5),enpassant) # actually enpassant is always false in here
+                print("white right castling")
+                move.castling = castlingtype.whiteRightCastling
+        self.moves.append(move)  # add the move to moves list
     def walkOrEatWithoutAnimation(self,firstSquare,secondSquare,enpassant):
         """ move/eat piece from firstSquare to secondSquare
         or the purpose of doing state space searches and trials to check for checks (in filter function) """
@@ -344,6 +371,19 @@ class Board:
                     self.getSquare(walk1 - 1, walk2).addPieces(
                         ChessPieces('Assets\Pieces\whitePawn.png', self.getSquare(walk1 - 1, walk2).piecelocation,
                                     type.PawnW, walk2, side.whiteside))
+            if (lastMove.getCastling() != castlingtype.noCastling):
+                if (lastMove.getCastling() == castlingtype.whiteRightCastling):
+                    self.walkOrEatWithoutAnimation(self.getSquare(7,5),self.getSquare(7,7),False)
+                    self.WhiteKingCastlingHandler.KingMove = False
+                elif (lastMove.getCastling() == castlingtype.whiteLeftCastling):
+                    self.walkOrEatWithoutAnimation(self.getSquare(7,3),self.getSquare(7,0),False)
+                    self.WhiteKingCastlingHandler.KingMove = False
+                elif (lastMove.getCastling() == castlingtype.blackRightCastling):
+                    self.walkOrEatWithoutAnimation(self.getSquare(0,3),self.getSquare(0,0),False)
+                    self.BlackKingCastlingHandler.KingMove = False
+                elif (lastMove.getCastling() == castlingtype.blackLeftCastling):
+                    self.walkOrEatWithoutAnimation(self.getSquare(0,5),self.getSquare(0,7),False)
+                    self.BlackKingCastlingHandler.KingMove = False
 
             self.moves.pop(-1) # and lastly, remove the last move in the move list.
 

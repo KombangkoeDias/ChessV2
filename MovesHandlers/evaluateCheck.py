@@ -93,8 +93,19 @@ class EvaluateCheck: # it will check the walks or eats and filter them so that i
     def detectPassSquareEaten(self,side,aSquare):
         for i in range(8):
             for j in range(8):
-                currSquare = self.chessboard.getSquare(i, j)
-                if (currSquare.Piece.type != type.Empty and currSquare.Piece.side != side):
+                notdetermineBothKingCastlingMoves = False # if determining both castling moves it will make infinite loop.
+                if (side == side.whiteside and self.chessboard.BlackKingCastlingHandler.determineCastlingBothSide()):
+                    if (self.chessboard.getSquare(i,j).Piece.type != type.KingB):
+                        currSquare = self.chessboard.getSquare(i, j)
+                        notdetermineBothKingCastlingMoves = True
+                elif (side == side.blackside and self.chessboard.WhiteKingCastlingHandler.determineCastlingBothSide()):
+                    if (self.chessboard.getSquare(i,j).Piece.type != type.KingW):
+                        currSquare = self.chessboard.getSquare(i,j)
+                        notdetermineBothKingCastlingMoves = True
+                else:
+                    currSquare = self.chessboard.getSquare(i,j)
+                    notdetermineBothKingCastlingMoves = True
+                if (currSquare.Piece.type != type.Empty and currSquare.Piece.side != side and notdetermineBothKingCastlingMoves):
                     moveSquares = self.evaluateMoveEngine.getFilteredPossibleWalks(currSquare)
                     if (aSquare in moveSquares):
                         return True

@@ -76,6 +76,9 @@ class CastlingMovesHandler:
         self.RookRightMove = False
         self.RookLeftMove = False
 
+    def determineCastlingBothSide(self):
+        return self.determineRightCastlingFromMovesAndNotCheck() or self.determineLeftCastlingFromMovesAndNotCheck()
+
     def determineRightCastlingFromMovesAndNotCheck(self):
         return not (self.KingMove or self.RookRightMove)
 
