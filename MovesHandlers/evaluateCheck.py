@@ -65,7 +65,7 @@ class EvaluateCheck: # it will check the walks or eats and filter them so that i
                 firstSquare.addPieces(firstPiece)
                 thisSquare.addPieces(secondPiece)
                 if(enpassant): # and after the move we add the eaten piece in the enpassant process.
-                    enpassantSquare.addPiece(enpassantPiece)
+                    enpassantSquare.addPieces(enpassantPiece)
 
         return resultlist
 
