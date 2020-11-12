@@ -95,18 +95,22 @@ class EvaluateCheck: # it will check the walks or eats and filter them so that i
             for j in range(8):
                 notdetermineBothKingCastlingMoves = False # if determining both castling moves it will make infinite loop.
                 if (side == side.whiteside and self.chessboard.BlackKingCastlingHandler.determineCastlingBothSide()):
+                    # if both side can do castling and white king is not selected then it's possible (without infinite loop)
                     if (self.chessboard.getSquare(i,j).Piece.type != type.KingB):
                         currSquare = self.chessboard.getSquare(i, j)
                         notdetermineBothKingCastlingMoves = True
                 elif (side == side.blackside and self.chessboard.WhiteKingCastlingHandler.determineCastlingBothSide()):
+                    # if both side can do castling and black king is not selected then it's also possible (without infinite loop)
                     if (self.chessboard.getSquare(i,j).Piece.type != type.KingW):
                         currSquare = self.chessboard.getSquare(i,j)
                         notdetermineBothKingCastlingMoves = True
-                else:
+                else: # if either side (white or black) can't castling then it's possible (without infinite loop)
                     currSquare = self.chessboard.getSquare(i,j)
                     notdetermineBothKingCastlingMoves = True
                 if (currSquare.Piece.type != type.Empty and currSquare.Piece.side != side and notdetermineBothKingCastlingMoves):
+                    # if possible to check without infinite loop then check if it's in any of other side's piece walk moves
                     moveSquares = self.evaluateMoveEngine.getFilteredPossibleWalks(currSquare)
-                    if (aSquare in moveSquares):
+                    if (aSquare in moveSquares): # if in walk moves of any other side's piece then say the pass area can be eaten.
                         return True
+        # if all other side's piece don't move in these pass square, then say the castling is possible.
         return False
