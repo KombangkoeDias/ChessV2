@@ -25,8 +25,8 @@ class Board:
         self.evaluateMovesEngine = EvaluateMovesEngine(self,self.evaluateCheckEngine)  # the class that call the handlers to evaluate the moves.
         self.whiteischecked = False
         self.blackischecked = False
-        self.BlackKingCastlingHandler = CastlingMovesHandler(side.blackside,self)
-        self.WhiteKingCastlingHandler = CastlingMovesHandler(side.whiteside,self)
+        self.BlackKingCastlingHandler = CastlingMovesHandler(side.blackside,self)  # the class handling castling
+        self.WhiteKingCastlingHandler = CastlingMovesHandler(side.whiteside,self)  # the class handling castling
 
     def InitializeBoard(self):
         """ return the initialized board as SquareList"""
@@ -152,8 +152,9 @@ class Board:
                     if (self.getSquare(i,j).getclick()):
                         if (len(self.clicklist) == 0 and self.getSquare(i,j).Piece.type != type.Empty):
                             self.clicklist.append(self.getSquare(i, j))
-                            self.possibleWalks = self.evaluateMovesEngine.getFilteredPossibleWalks(self.getSquare(i, j))
 
+                            # get possible walks and eats
+                            self.possibleWalks = self.evaluateMovesEngine.getFilteredPossibleWalks(self.getSquare(i, j))
                             self.possibleEats = self.evaluateMovesEngine.getFilteredPossibleEats(self.getSquare(i,j))
 
                             for walks in self.possibleWalks:
@@ -163,6 +164,7 @@ class Board:
                                 if (self.evaluateMovesEngine.evaluateMove(self.clicklist[0], self.getSquare(i,j))):
                                     self.clicklist.append(self.getSquare(i,j))
 
+                                    # check if the move affect the ability to castling (such as rook, king moves)
                                     self.WhiteKingCastlingHandler.determineMoveEffectOnCastling(self.clicklist[0])
                                     self.BlackKingCastlingHandler.determineMoveEffectOnCastling(self.clicklist[0])
 
@@ -240,7 +242,7 @@ class Board:
 
         square2.addPieces(piece1)
 
-        if (enpassant): # if en passant, remove the eaten piece.
+        if (enpassant):  # if en passant, remove the eaten piece.
             walkSquare = self.clicklist[1]
             (walk1,walk2) = self.findIJSquare(walkSquare)
             if (piece1.side == side.whiteside):
@@ -250,7 +252,7 @@ class Board:
             eatSquare.addPieces(ChessPieces('Assets\Pieces\empty.png', eatSquare.Piece.getlocation(), type.Empty, None, side.noside))
             print("en passant move")
 
-        if (castling):
+        if (castling):  # if castling, move the rook accordingly
             print("castling")
             if(self.getSquare(0,2).Piece.type == type.KingB ):
                 print("black right castling")
@@ -361,35 +363,54 @@ class Board:
             square1.addPieces(piece1) # then really change the position of the pice.
             square2.addPieces(piece2)
 
-            if (lastMove.enPassant):
+            if (lastMove.enPassant): # if last move is enpassant we'll need to add the eaten pawn back
                 (walk1, walk2) = self.findIJSquare(square2)
+                # check if the moving piece is white or black
                 if (piece1.side == side.whiteside):
+                    # adding pawn back
                     self.getSquare(walk1 + 1, walk2).addPieces(
                         ChessPieces('Assets/Pieces/blackPawn.png', self.getSquare(walk1 + 1, walk2).piecelocation,
                                     type.PawnB, walk2, side.blackside))
                 if (piece1.side == side.blackside):
+                    # adding pawn back
                     self.getSquare(walk1 - 1, walk2).addPieces(
                         ChessPieces('Assets\Pieces\whitePawn.png', self.getSquare(walk1 - 1, walk2).piecelocation,
                                     type.PawnW, walk2, side.whiteside))
+
+            # for reversing the castling moves we need to move Rook back
             if (lastMove.getCastling() != castlingtype.noCastling):
                 if (lastMove.getCastling() == castlingtype.whiteRightCastling):
                     self.walkOrEatWithoutAnimation(self.getSquare(7,5),self.getSquare(7,7),False)
-                    self.WhiteKingCastlingHandler.KingMove = False
                 elif (lastMove.getCastling() == castlingtype.whiteLeftCastling):
                     self.walkOrEatWithoutAnimation(self.getSquare(7,3),self.getSquare(7,0),False)
-                    self.WhiteKingCastlingHandler.KingMove = False
                 elif (lastMove.getCastling() == castlingtype.blackRightCastling):
                     self.walkOrEatWithoutAnimation(self.getSquare(0,3),self.getSquare(0,0),False)
-                    self.BlackKingCastlingHandler.KingMove = False
                 elif (lastMove.getCastling() == castlingtype.blackLeftCastling):
                     self.walkOrEatWithoutAnimation(self.getSquare(0,5),self.getSquare(0,7),False)
+
+            # if the reverse move make the king moves gone from the moves list then we allow the king to castle
+            if(self.BlackKingCastlingHandler.KingMove):
+                returnToNoKingMove = True
+                for move in self.moves[:-1]: # not considering the last move as it's being reversed.
+                    if(move.firstPiece.type == type.KingB): # if there's any king move left then no
+                        returnToNoKingMove = False
+                        break
+                if(returnToNoKingMove): # if not then change the KingMove field
                     self.BlackKingCastlingHandler.KingMove = False
+            if(self.WhiteKingCastlingHandler.KingMove):
+                returnToNoKingMove = True
+                for move in self.moves[:-1]: # not considering the last move as it's being reversed.
+                    if(move.firstPiece.type == type.KingW): # if there's any king move left then no
+                        returnToNoKingMove = False
+                if(returnToNoKingMove): # if not then change the KingMove field
+                    self.WhiteKingCastlingHandler.KingMove = False
 
             self.moves.pop(-1) # and lastly, remove the last move in the move list.
 
             # also after moving back check again for check to draw purple squares.
             self.whiteischecked = self.evaluateCheckEngine.checkCheck(side.whiteside)
             self.blackischecked = self.evaluateCheckEngine.checkCheck(side.blackside)
+            # in case the board is inactive from the last move since we reverse, it's now active.
             self.boardActive = True
 
     def printBoard(self):

@@ -77,12 +77,14 @@ class EvaluateCheck: # it will check the walks or eats and filter them so that i
             for i in range(8):
                 for j in range(8):
                     currSquare = self.chessboard.getSquare(i,j)
-                    if (currSquare.Piece.type != type.Empty and currSquare.Piece.side == side):
-                        if (totalMoves > 0):
+                    if (currSquare.Piece.type != type.Empty and currSquare.Piece.side == side):  # all piece of side
+                        if (totalMoves > 0):  # check for totalmoves left of the side.
                             return False
                         totalMoves += len(self.evaluateMoveEngine.getFilteredPossibleWalks(currSquare))
                         totalMoves += len(self.evaluateMoveEngine.getFilteredPossibleEats(currSquare))
-            if (totalMoves == 0 and self.checkCheck(side)):
+
+            # if total moves is zero and check it's checkmate.
+            if (totalMoves == 0 and self.checkCheck(side)):  # here if not checked it will be stalemate instead.
                 if (side == side.whiteside ):
                     print("white is checked mate, black wins")
                 if (side == side.blackside ):
@@ -91,9 +93,11 @@ class EvaluateCheck: # it will check the walks or eats and filter them so that i
         return False
 
     def detectPassSquareEaten(self,side,aSquare):
+        '''Determine if the square can be target of other pieces from another side'''
         for i in range(8):
             for j in range(8):
-                notdetermineBothKingCastlingMoves = False # if determining both castling moves it will make infinite loop.
+                # if determining both castling moves it will make infinite loop.
+                notdetermineBothKingCastlingMoves = False
                 if (side == side.whiteside and self.chessboard.BlackKingCastlingHandler.determineCastlingBothSide()):
                     # if both side can do castling and white king is not selected then it's possible (without infinite loop)
                     if (self.chessboard.getSquare(i,j).Piece.type != type.KingB):
