@@ -9,6 +9,8 @@ from MovesHandlers.evaluateCheck import EvaluateCheck
 from MovesHandlers.KingMovesHandler import CastlingMovesHandler
 from Moves import Moves
 from castling import castlingtype
+from PromotionHandler import PromotionHandler
+from DrawButtons import drawBackButton
 
 class Board:
     def __init__(self,screen):
@@ -27,6 +29,8 @@ class Board:
         self.blackischecked = False
         self.BlackKingCastlingHandler = CastlingMovesHandler(side.blackside,self)  # the class handling castling
         self.WhiteKingCastlingHandler = CastlingMovesHandler(side.whiteside,self)  # the class handling castling
+        self.promotion = False
+        self.promotionHandler = PromotionHandler(self,self.screen)
 
     def InitializeBoard(self):
         """ return the initialized board as SquareList"""
@@ -177,6 +181,7 @@ class Board:
                                     castling = (self.clicklist[0].Piece.type == type.KingW or self.clicklist[0].Piece.type == type.KingB)\
                                                and abs(secondCol - firstCol) == 2
 
+
                                     # clear these two lists(walklist,eatlist) before move for aesthetic effect
                                     self.possibleWalks.clear()  # after a move we clear the walklist
                                     self.possibleEats.clear()  # same
@@ -185,6 +190,7 @@ class Board:
 
                                     # call the function to handle walk or eat moves
                                     self.walkOrEat(enpassant,castling)
+
                                     self.clicklist.clear() # after handling the walk or eat we clear the clicklist, obviously
 
                                     # in every moves we need to check if there is checking in the board for both black and white.
@@ -208,6 +214,19 @@ class Board:
                                 self.possibleWalks = self.evaluateMovesEngine.getFilteredPossibleWalks(self.getSquare(i, j))# and recalculate
                                 self.possibleEats = self.evaluateMovesEngine.getFilteredPossibleEats(self.getSquare(i, j))
         else: # board not active
+            if (self.promotion != False and self.promotionHandler.choosePromotionSquare != None): # chosen the promotion type.
+                # add piece to the square
+                self.promotionHandler.putInSquare.addPieces(self.promotionHandler.choosePromotionSquare.Piece)
+                self.promotion = False
+                self.promotionHandler.choosePromotionSquare = None
+                self.boardActive = True
+
+            elif (self.promotion != False): # still not chosen the promotion type
+                '''handle promotion'''
+                self.promotionHandler.determinePromotionSquares(self.promotion)
+                self.promotionHandler.drawChooose(self.promotion)
+                self.promotionHandler.detectClick()
+
             self.clicklist.clear()
             self.possibleWalks.clear()
             self.possibleEats.clear()
@@ -234,6 +253,9 @@ class Board:
         castlingVal = castlingtype.noCastling
         move = Moves(square1, piece1, square2, piece2, enpassant,castlingVal)
 
+        Width, Height = pygame.display.get_surface().get_size()
+
+        drawBackButton(self.screen, Width, Height, self)  # for consistency of back button
 
         self.doAnimation(location1,location2,square1,square2,piece1) # doAnimation function gradually updates location of piece1
 
@@ -321,6 +343,8 @@ class Board:
         differencex = (secondj - firstj) * 70
         differencey = (secondi - firsti) * 70
 
+
+
         # divide moves animation into 50 frames.
         for i in range(50):
             movementx = differencex / 50 * i # the x velocity
@@ -328,6 +352,7 @@ class Board:
             pygame.time.delay(1) # some delay
             myPiece.addlocation((firstx + movementx, firsty + movementy)) # then change the location
             self.drawBoardAndPieces() # and draw it again
+
             if i == 30: # play sounds at the frame 30
                 moveSound = pygame.mixer.Sound('Assets/Sounds/moveSound.wav')
                 moveSound.play()
