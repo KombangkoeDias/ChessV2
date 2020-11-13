@@ -12,8 +12,8 @@ class PawnMovesHandler:
         (row, col) = self.chessboard.findIJSquare(firstSquare)
         if (firstSquare.Piece.type == type.PawnW): # for white
             one_step_square = self.chessboard.getSquare(row-1,col)
-            two_step_square = self.chessboard.getSquare(row-2,col)
             if (row == 6):
+                two_step_square = self.chessboard.getSquare(row - 2, col)
                 if (one_step_square.Piece.type == type.Empty):
                     self.possibleWalks.append(one_step_square)
                     if (two_step_square.Piece.type == type.Empty):
@@ -24,8 +24,8 @@ class PawnMovesHandler:
 
         if (firstSquare.Piece.type == type.PawnB): # for black
             one_step_square = self.chessboard.getSquare(row + 1, col)
-            two_step_square = self.chessboard.getSquare(row + 2, col)
             if (row == 1):
+                two_step_square = self.chessboard.getSquare(row + 2, col)
                 if (one_step_square.Piece.type == type.Empty):
                     self.possibleWalks.append(one_step_square)
                     if (two_step_square.Piece.type == type.Empty):
