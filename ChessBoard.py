@@ -214,15 +214,17 @@ class Board:
                                 self.possibleWalks = self.evaluateMovesEngine.getFilteredPossibleWalks(self.getSquare(i, j))# and recalculate
                                 self.possibleEats = self.evaluateMovesEngine.getFilteredPossibleEats(self.getSquare(i, j))
         else: # board not active
+            # if promotion is occurred
             if (self.promotion != False and self.promotionHandler.choosePromotionSquare != None): # chosen the promotion type.
                 # add piece to the square
                 self.promotionHandler.putInSquare.addPieces(self.promotionHandler.choosePromotionSquare.Piece)
-                self.promotion = False
-                self.promotionHandler.choosePromotionSquare = None
-                self.boardActive = True
+                self.promotion = False  # update the field
+                self.promotionHandler.choosePromotionSquare = None  # and the pawn promotion square
+                self.boardActive = True  # after the promotion is complete set board to be active again
 
             elif (self.promotion != False): # still not chosen the promotion type
                 '''handle promotion'''
+                # keep drawing and detecting click if promotion choice is not chosen yet.
                 self.promotionHandler.determinePromotionSquares(self.promotion)
                 self.promotionHandler.drawChooose(self.promotion)
                 self.promotionHandler.detectClick()
@@ -254,7 +256,6 @@ class Board:
         move = Moves(square1, piece1, square2, piece2, enpassant,castlingVal)
 
         Width, Height = pygame.display.get_surface().get_size()
-
         drawBackButton(self.screen, Width, Height, self)  # for consistency of back button
 
         self.doAnimation(location1,location2,square1,square2,piece1) # doAnimation function gradually updates location of piece1
