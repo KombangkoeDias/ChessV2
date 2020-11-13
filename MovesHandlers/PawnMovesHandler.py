@@ -81,30 +81,6 @@ class PawnMovesHandler:
                         and piece.type == type.PawnW):
                     self.possibleEats.append(self.chessboard.getSquare(row + 1, firstlast2)) # so we add the en passant square to the eatlist
 
-    def detectPromotion(self):
-        """
-        detect promotion and change field promotion in chessboard
-        :param promotionSquare: The square in which the to-be-promoted pawn is at.
-        """
-        promotion = False
-        i = 0
-        for j in range(8):
-            if(self.chessboard.getSquare(i,j).Piece.type == type.PawnW):
-                self.chessboard.promotion = side.whiteside
-                self.chessboard.boardActive = False
-                promotion = True
-
-                break
-
-        i = 7
-        for j in range(8):
-            if(self.chessboard.getSquare(i,j).Piece.type == type.PawnB):
-                self.chessboard.promotion = side.blackside
-                self.chessboard.boardActive = False
-                promotion = True
-                break
-        if (not promotion):
-            self.chessboard.promotion = False
 
 
 
