@@ -1,3 +1,4 @@
+from side import side
 
 class DrawHandler:
     def __init__(self,chessboard):
@@ -8,9 +9,22 @@ class DrawHandler:
         self.fiftyMoves = False
         self.threeFoldRepetition = False
 
-    def determineStaleMate(self):
-        #TODO implement stalemate detection
-        pass
+    def determineStaleMate(self,side):
+        if (self.chessboard.evaluateCheckEngine.checkCheck(side)):
+            return False
+        for i in range(8):
+            for j in range(8):
+                currSquare = self.chessboard.getSquare(i,j)
+                if(currSquare.Piece.side == side):
+                    walkList = self.chessboard.evaluateMovesEngine.getFilteredPossibleWalks(currSquare)
+
+                    if(len(walkList) > 0):
+                        return False
+                    else:
+                        eatList = self.chessboard.evaluateMovesEngine.getFilteredPossibleEats(currSquare)
+                        if(len(eatList) > 0):
+                            return False
+        return True
 
     def determineDeadPosition(self):
         # pretty hard to determine

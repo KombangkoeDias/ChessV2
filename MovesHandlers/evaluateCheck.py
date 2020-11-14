@@ -56,7 +56,8 @@ class EvaluateCheck: # it will check the walks or eats and filter them so that i
 
                 # we will choose and not choose to add into resultlist
                 if(self.checkCheck(currentSide)): # if the move makes its own side checked then not include it
-                    print("remove", self.chessboard.findIJSquare(thisSquare), "of", firstPiece.type)
+                    pass
+                    #print("remove", self.chessboard.findIJSquare(thisSquare), "of", firstPiece.type)
                 else: # if not it will be add into resultlist.
                     resultlist.append(thisSquare)
 

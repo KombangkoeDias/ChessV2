@@ -11,6 +11,7 @@ from Moves import Moves
 from castling import castlingtype
 from PromotionHandler import PromotionHandler
 from DrawButtons import drawBackButton
+from DrawsHandler.DrawHandler import DrawHandler
 
 class Board:
     def __init__(self,screen):
@@ -31,7 +32,7 @@ class Board:
         self.WhiteKingCastlingHandler = CastlingMovesHandler(side.whiteside,self)  # the class handling castling
         self.promotion = False
         self.promotionHandler = PromotionHandler(self,self.screen)
-
+        self.DrawHandler = DrawHandler(self)
     def InitializeBoard(self):
         """ return the initialized board as SquareList"""
         self.Squarelist = list() # make it a list
@@ -46,22 +47,28 @@ class Board:
                     # add empty to every square first.
                     newSquare.addPieces(ChessPieces('Assets\Pieces\empty.png', piecelocation, type.Empty, None, side.noside))
                     # then change it if it's the case.
+
                     if (i == 1):
                         newSquare.addPieces(
                             ChessPieces('Assets/Pieces/blackPawn.png', piecelocation, type.PawnB, j, side.blackside))
+
                     if (i == 0):
+
                         if (j == 0):
                             newSquare.addPieces(
                                 ChessPieces('Assets/Pieces/blackRook.png', piecelocation, type.RookB, 0, side.blackside))
                         if (j == 2):
                             newSquare.addPieces(
                                 ChessPieces('Assets/Pieces/blackBishop.png', piecelocation, type.BishopB, 0, side.blackside))
+
                         if (j == 4):
                             newSquare.addPieces(
                                 ChessPieces('Assets\Pieces/blackKing.png', piecelocation, type.KingB, 0, side.blackside))
+
                         if (j == 6):
                             newSquare.addPieces(
                                 ChessPieces('Assets/Pieces/blackKnight.png', piecelocation, type.KnightB, 1, side.blackside))
+
                     if (i == 6):
                         newSquare.addPieces(
                             ChessPieces('Assets\Pieces\whitePawn.png', piecelocation, type.PawnW, j, side.whiteside))
@@ -84,6 +91,7 @@ class Board:
                     newSquare = Square(220 + 70 * j, 30 + 70 * i, 70, 70, darkSquare)
                     piecelocation = (newSquare.x + 10, newSquare.y + 10)
                     newSquare.addPieces(ChessPieces('Assets\Pieces\empty.png', piecelocation, type.Empty, None, side.noside))
+
                     if (i == 1):
                         newSquare.addPieces(
                             ChessPieces('Assets/Pieces/blackPawn.png', piecelocation, type.PawnB, j, side.blackside))
@@ -100,6 +108,7 @@ class Board:
                         if (j == 7):
                             newSquare.addPieces(
                                 ChessPieces('Assets/Pieces/blackRook.png', piecelocation, type.RookB, 1, side.blackside))
+
                     if (i == 6):
                         newSquare.addPieces(
                             ChessPieces('Assets\Pieces\whitePawn.png', piecelocation, type.PawnW, j, side.whiteside))
@@ -148,6 +157,14 @@ class Board:
         """ return the square at position (i,j) """
         return self.Squarelist[i][j]
 
+    def detectDraw(self):
+        if(self.DrawHandler.determineStaleMate(side.whiteside)):
+            self.boardActive = False
+            print("draw because of white stalemate")
+        if(self.DrawHandler.determineStaleMate(side.blackside)):
+            self.boardActive = False
+            print("draw because of black stalemate")
+
     def detectClick(self):
         """ detect the click in all the squares on the board and append the clicked square to the click list """
         if(self.boardActive):
@@ -190,6 +207,8 @@ class Board:
 
                                     # call the function to handle walk or eat moves
                                     self.walkOrEat(enpassant,castling)
+
+                                    self.detectDraw()
 
                                     self.clicklist.clear() # after handling the walk or eat we clear the clicklist, obviously
 

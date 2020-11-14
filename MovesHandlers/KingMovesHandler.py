@@ -46,7 +46,7 @@ class KingMovesHandler:
                         self.chessboard.WhiteKingCastlingHandler.determineCastlingFromCheck(whiteSideRightSquares)):
                     for square in whiteSideRightSquares:  # for king side castling add all
                         self.possibleWalks.append(square)
-                    print("white can right castling")
+                    #print("white can right castling")
             if (self.chessboard.WhiteKingCastlingHandler.determineLeftCastlingFromMovesAndNotCheck()):
                 # check that the castling passing moves square are all empty
                 if (whiteSideLeftSquares[0].Piece.type == type.Empty and
@@ -55,7 +55,7 @@ class KingMovesHandler:
                         self.chessboard.WhiteKingCastlingHandler.determineCastlingFromCheck(whiteSideLeftSquares)):
                     for square in whiteSideLeftSquares[1:3]:  # for queen side castling only add 2 of them.
                         self.possibleWalks.append(square)
-                    print("white can left castling")
+                    #print("white can left castling")
 
         # for black # the castling is possible firstly if not checked.
         if(currSide == side.blackside and not self.chessboard.evaluateCheckEngine.checkCheck(side.blackside)):
@@ -67,7 +67,7 @@ class KingMovesHandler:
                         self.chessboard.BlackKingCastlingHandler.determineCastlingFromCheck(blackSideRightSquares)):
                     for square in blackSideRightSquares[1:3]:  # for queen side castling only add 2 of them.
                         self.possibleWalks.append(square)
-                    print("black can right castling")
+                    #print("black can right castling")
             if (self.chessboard.BlackKingCastlingHandler.determineLeftCastlingFromMovesAndNotCheck()):
                 # check that the castling passing moves square are all empty
                 if (blacksideLeftSquares[0].Piece.type == type.Empty and
@@ -75,7 +75,7 @@ class KingMovesHandler:
                         self.chessboard.BlackKingCastlingHandler.determineCastlingFromCheck(blacksideLeftSquares)):
                     for square in blacksideLeftSquares:  # for king side castling add all
                         self.possibleWalks.append(square)
-                    print("black can left castling")
+                    #print("black can left castling")
 
 class CastlingMovesHandler:
     def __init__(self,side,chessboard):
