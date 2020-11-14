@@ -9,6 +9,11 @@ class DrawHandler:
         self.fiftyMoves = False
         self.threeFoldRepetition = False
 
+    def determineDraw(self):
+        return (self.determineStaleMate(side.whiteside) or self.determineStaleMate(side.blackside)
+                or self.determineDeadPosition() or self.determinefiftyMoves()
+                or self.determineThreeFoldRepetition())
+
     def determineStaleMate(self,side):
         if (self.chessboard.evaluateCheckEngine.checkCheck(side)):
             return False
