@@ -1,14 +1,14 @@
 
 class Moves:
-    def __init__(self,firstSquare, firstPiece, secondSquare, secondPiece, enPassant,castling):
+    def __init__(self,firstSquare, firstPiece, secondSquare, secondPiece, enPassant,castling,eatmove):
         self.firstSquare = firstSquare
         self.firstPiece = firstPiece
         self.secondSquare = secondSquare
         self.secondPiece = secondPiece
         self.enPassant = enPassant
         self.castling = castling
-        # somehow the real square is in lastMove.firstSquare[0] and lastMove.firstSquare is a tuple of one element
-        # and the same for these two but not for piece 2 ??? how strange is that
+        self.eatmove = eatmove
+
     def getFirstSquare(self):
         return self.firstSquare
     def getSecondSquare(self):
@@ -19,3 +19,5 @@ class Moves:
         return self.secondPiece
     def getCastling(self):
         return self.castling
+    def IsEatMove(self):
+        return self.eatmove

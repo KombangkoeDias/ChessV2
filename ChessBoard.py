@@ -10,11 +10,12 @@ from MovesHandlers.KingMovesHandler import CastlingMovesHandler
 from Moves import Moves
 from castling import castlingtype
 from PromotionHandler import PromotionHandler
-from DrawButtons import drawBackButton
+from DrawButtons import drawReverseMoveButton,drawBackButton
 from DrawsHandler.DrawHandler import DrawHandler
+from Mode import mode
 
 class Board:
-    def __init__(self,screen):
+    def __init__(self,screen,GameMode,mainMenuFunc):
         """ initialize the ChessBoard """
         self.Squarelist = list() # Squarelist will hold the list of rows of Squares.
         self.clicklist = list() # clicklist will hold the chosen Square and Destination Square.
@@ -33,6 +34,9 @@ class Board:
         self.promotion = False
         self.promotionHandler = PromotionHandler(self,self.screen)
         self.DrawHandler = DrawHandler(self)
+        self.currentSide = side.whiteside
+        self.GameMode = GameMode
+        self.mainMenuFunc = mainMenuFunc
     def InitializeBoard(self):
         """ return the initialized board as SquareList"""
         self.Squarelist = list() # make it a list
@@ -158,12 +162,10 @@ class Board:
         return self.Squarelist[i][j]
 
     def detectDraw(self):
-        if(self.DrawHandler.determineStaleMate(side.whiteside)):
+        if(self.DrawHandler.determineDraw()):
             self.boardActive = False
-            print("draw because of white stalemate")
-        if(self.DrawHandler.determineStaleMate(side.blackside)):
-            self.boardActive = False
-            print("draw because of black stalemate")
+            print("Draw")
+
 
     def detectClick(self):
         """ detect the click in all the squares on the board and append the clicked square to the click list """
@@ -171,7 +173,8 @@ class Board:
             for i in range(8):
                 for j in range(8):
                     if (self.getSquare(i,j).getclick()):
-                        if (len(self.clicklist) == 0 and self.getSquare(i,j).Piece.type != type.Empty):
+                        if (len(self.clicklist) == 0 and self.getSquare(i,j).Piece.type != type.Empty
+                                and self.getSquare(i,j).Piece.side == self.currentSide):
                             self.clicklist.append(self.getSquare(i, j))
 
                             # get possible walks and eats
@@ -198,15 +201,18 @@ class Board:
                                     castling = (self.clicklist[0].Piece.type == type.KingW or self.clicklist[0].Piece.type == type.KingB)\
                                                and abs(secondCol - firstCol) == 2
 
-
                                     # clear these two lists(walklist,eatlist) before move for aesthetic effect
                                     self.possibleWalks.clear()  # after a move we clear the walklist
                                     self.possibleEats.clear()  # same
 
-
-
                                     # call the function to handle walk or eat moves
                                     self.walkOrEat(enpassant,castling)
+
+                                    # after walk we change side
+                                    if(self.currentSide == side.whiteside):
+                                        self.currentSide = side.blackside
+                                    else:
+                                        self.currentSide =side.whiteside
 
                                     self.detectDraw()
 
@@ -265,17 +271,20 @@ class Board:
         location1 = piece1.getlocation() # and location of them
         location2 = piece2.getlocation()
         # and print something just for tracking
+        eatmove = False
         if (square1.Piece.type != square2.Piece.type and square1.Piece.type != type.Empty and square2.Piece.type != type.Empty):
             print(square1.Piece.type.value, "eat", square2.Piece.type.value, "at", self.toNotation(self.findIJSquare(square2)))
+            eatmove = True
         else:
             print(square1.Piece.type.value, "to", self.toNotation(self.findIJSquare(square2)))
         # create an instance of Moves class to track move and pieces
 
         castlingVal = castlingtype.noCastling
-        move = Moves(square1, piece1, square2, piece2, enpassant,castlingVal)
+        move = Moves(square1, piece1, square2, piece2, enpassant,castlingVal,eatmove)
 
         Width, Height = pygame.display.get_surface().get_size()
-        drawBackButton(self.screen, Width, Height, self)  # for consistency of back button
+        drawReverseMoveButton(self.screen, Width, Height, self)  # for consistency of reverseMove button
+        drawBackButton(self.screen,Width,Height,self.mainMenuFunc) # for consistency of back button
 
         self.doAnimation(location1,location2,square1,square2,piece1) # doAnimation function gradually updates location of piece1
 
@@ -363,7 +372,8 @@ class Board:
         differencex = (secondj - firstj) * 70
         differencey = (secondi - firsti) * 70
 
-
+        Width, Height = pygame.display.get_surface().get_size()
+        drawBackButton(self.screen, Width, Height, self.mainMenuFunc) # for consistency of Back button
 
         # divide moves animation into 50 frames.
         for i in range(50):
@@ -456,6 +466,12 @@ class Board:
             self.whiteischecked = self.evaluateCheckEngine.checkCheck(side.whiteside)
             self.blackischecked = self.evaluateCheckEngine.checkCheck(side.blackside)
             # in case the board is inactive from the last move since we reverse, it's now active.
+
+            # also after reverse move we change side
+            if(self.currentSide == side.whiteside):
+                self.currentSide = side.blackside
+            else:
+                self.currentSide = side.whiteside
             self.boardActive = True
 
     def printBoard(self):
