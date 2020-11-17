@@ -71,8 +71,12 @@ class EvaluateMovesEngine:
             possibleeats = self.KingMovesHandler.findAllPossibleEats(firstSquare)
         return possibleeats
     def getFilteredPossibleWalks(self,firstSquare):
+        """This function return all possible walks for the piece in the firstSquare parameter
+        :param firstSquare the square to determine all walks"""
         return self.evaluateCheckEngine.filterWalks(self.getPossibleWalks(firstSquare),firstSquare)
     def getFilteredPossibleEats(self,firstSquare):
+        """This function return all possible eats for the piece in the firstSquare parameter
+        :param firstSquare the square to determine all eats"""
         return self.evaluateCheckEngine.filterEats(self.getPossibleEats(firstSquare),firstSquare)
 
 

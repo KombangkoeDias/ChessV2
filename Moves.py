@@ -7,7 +7,7 @@ class Moves:
         self.secondPiece = secondPiece
         self.enPassant = enPassant
         self.castling = castling
-        self.eatmove = eatmove
+        self.eatmove = eatmove # determine if the move is eating move.
 
     def getFirstSquare(self):
         return self.firstSquare

@@ -1,21 +1,22 @@
 import pygame
-from Color import lightSquare,darkSquare,green
+from UserInterface.Color import lightSquare,darkSquare,green
 from type import type
 from side import side
-from Square import Square
-from ChessPiece import ChessPieces
+from UserInterface.Square import Square
+from UserInterface.ChessPiece import ChessPieces
 from EvaluateMovesEngine import EvaluateMovesEngine
 from MovesHandlers.evaluateCheck import EvaluateCheck
 from MovesHandlers.KingMovesHandler import CastlingMovesHandler
 from Moves import Moves
-from castling import castlingtype
+from castling import castlingtype,findCastlingType
 from PromotionHandler import PromotionHandler
-from DrawButtons import drawReverseMoveButton,drawBackButton
+from UserInterface.DrawButtons import drawReverseMoveButton,drawBackButton
 from DrawsHandler.DrawHandler import DrawHandler
 from Mode import mode
+from OpponentMovesEngine import OpponentMovesEngine
 
 class Board:
-    def __init__(self,screen,GameMode,mainMenuFunc):
+    def __init__(self,screen,GameMode,mainMenuFunc,PlayerSide):
         """ initialize the ChessBoard """
         self.Squarelist = list() # Squarelist will hold the list of rows of Squares.
         self.clicklist = list() # clicklist will hold the chosen Square and Destination Square.
@@ -34,9 +35,13 @@ class Board:
         self.promotion = False
         self.promotionHandler = PromotionHandler(self,self.screen)
         self.DrawHandler = DrawHandler(self)
-        self.currentSide = side.whiteside
+        if(GameMode == mode.TwoPlayer):
+            self.currentSide = side.whiteside
+        else:
+            self.currentSide = PlayerSide
         self.GameMode = GameMode
         self.mainMenuFunc = mainMenuFunc
+        self.OpponentMovesEngine = OpponentMovesEngine(self)
     def InitializeBoard(self):
         """ return the initialized board as SquareList"""
         self.Squarelist = list() # make it a list
@@ -209,10 +214,12 @@ class Board:
                                     self.walkOrEat(enpassant,castling)
 
                                     # after walk we change side
-                                    if(self.currentSide == side.whiteside):
-                                        self.currentSide = side.blackside
-                                    else:
-                                        self.currentSide =side.whiteside
+                                    if(self.GameMode == mode.TwoPlayer):
+                                        if(self.currentSide == side.whiteside):
+                                            self.currentSide = side.blackside
+                                        else:
+                                            self.currentSide =side.whiteside
+
 
                                     self.detectDraw()
 
@@ -229,6 +236,11 @@ class Board:
                                         print("black is checked")
                                         if(self.evaluateCheckEngine.detect_CheckMate(side.blackside)):
                                             self.boardActive = False
+                                    if(self.GameMode != mode.TwoPlayer):
+                                        if(self.GameMode == mode.OnePlayerAlphaBeta):
+                                            self.OpponentMovesEngine.findBestMovesUsingAlPhaBetaPruning()
+                                        else:
+                                            self.OpponentMovesEngine.findBestMovesUsingMachineLearning()
 
                             elif (self.getSquare(i,j).Piece != self.clicklist[0].Piece): # in case that the second click is of the same side as the Piece in the first click this is the
                                 # changing chosen Piece case
@@ -323,6 +335,8 @@ class Board:
                 move.castling = castlingtype.whiteRightCastling
         self.moves.append(move)  # add the move to moves list
     def walkOrEatWithoutAnimation(self,firstSquare,secondSquare,enpassant):
+        # TODO make this function add move to self.moves list and another function (reverse of this function will
+        #  remove it)
         """ move/eat piece from firstSquare to secondSquare
         or the purpose of doing state space searches and trials to check for checks (in filter function) """
 
@@ -344,7 +358,20 @@ class Board:
             else:
                 eatSquare = self.getSquare(walk1 - 1, walk2)
             eatSquare.addPieces(ChessPieces('Assets\Pieces\empty.png', eatSquare.Piece.getlocation(), type.Empty, None, side.noside))
-
+        firstRow, firstCol = self.findIJSquare(firstSquare)
+        secondRow, secondCol = self.findIJSquare(secondSquare)
+        castling = (firstSquare.Piece.type == type.KingW or firstSquare.Piece.type == type.KingB) \
+                   and abs(secondCol - firstCol) == 2
+        if(castling):
+            castlingType = findCastlingType(self,firstSquare,secondSquare)
+            if(castlingType == castlingtype.whiteRightCastling):
+                self.walkOrEatWithoutAnimation(self.getSquare(7,7),self.getSquare(7,5),False)
+            elif(castlingType == castlingtype.whiteLeftCastling):
+                self.walkOrEatWithoutAnimation(self.getSquare(7,0),self.getSquare(7,3),False)
+            elif(castlingType == castlingtype.blackRightCastling):
+                self.walkOrEatWithoutAnimation(self.getSquare(0,0),self.getSquare(0,3),False)
+            elif(castlingType == castlingtype.blackLeftCastling):
+                self.walkOrEatWithoutAnimation(self.getSquare(0,7),self.getSquare(0,5),False)
     def checkIJInSquare(self,i,j):
         """ The function to check if the square at i,j is in the board"""
         if 0 <= i and i <= 7 and 0 <= j and j <= 7:
@@ -468,10 +495,11 @@ class Board:
             # in case the board is inactive from the last move since we reverse, it's now active.
 
             # also after reverse move we change side
-            if(self.currentSide == side.whiteside):
-                self.currentSide = side.blackside
-            else:
-                self.currentSide = side.whiteside
+            if (self.GameMode == mode.TwoPlayer):
+                if(self.currentSide == side.whiteside):
+                    self.currentSide = side.blackside
+                else:
+                    self.currentSide = side.whiteside
             self.boardActive = True
 
     def printBoard(self):

@@ -1,4 +1,5 @@
 import pygame
+import os
 import enum
 from side import side
 from type import type
@@ -21,4 +22,4 @@ class ChessPieces:
     def getlocation(self):
         return (self.rect.left,self.rect.top)
 
-EmptyPiece = ChessPieces('Assets\Pieces\empty.png', (0,0),type.Empty,None,side.noside)
+EmptyPiece = ChessPieces(os.path.join('Assets','Pieces','empty.png'), (0, 0), type.Empty, None, side.noside)

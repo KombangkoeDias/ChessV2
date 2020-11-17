@@ -1,5 +1,5 @@
-from Button import button
-from Color import vegasgold, gold
+from UserInterface.Button import button
+from UserInterface.Color import vegasgold, gold
 
 
 

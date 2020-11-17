@@ -1,11 +1,12 @@
 import pygame
 from ChessBoard import Board
-from DrawButtons import drawReverseMoveButton
-from Background import BackgroundPhoto
-from Button import button
-from Color import gold,vegasgold,red,darkred,lightblue,darkgreen
+from UserInterface.DrawButtons import drawReverseMoveButton
+from UserInterface.Background import BackgroundPhoto
+from UserInterface.Button import button
+from UserInterface.Color import gold,vegasgold,red,darkred, darkgreen
 from Mode import mode
 from side import side
+import os
 
 pygame.init() # initiate the pygame library
 
@@ -21,7 +22,7 @@ Gamemode = None
 PlayerSide = None
 
 def mainMenu():
-    GameplayBackground = BackgroundPhoto('Assets\Background\Chessbackground.png', [0, 0])
+    GameplayBackground = BackgroundPhoto(os.path.join("Assets","Background","Chessbackground.png"), [0, 0])
     mainMenu = True
     print("Main Menu starting")
     buttonWidth = 150
@@ -37,7 +38,7 @@ def mainMenu():
                 pygame.quit()
 
 def chooseMode():
-    GameplayBackground = BackgroundPhoto('Assets\Background\Chessbackground.png', [0, 0])
+    GameplayBackground = BackgroundPhoto(os.path.join("Assets","Background","Chessbackground.png"), [0, 0])
     chosen = False
     print("chosen Menu Starting")
     buttonWidth = 150
@@ -70,7 +71,7 @@ def chooseMode():
                 pygame.quit()
 
 def chooseSide():
-    GameplayBackground = BackgroundPhoto('Assets\Background\Chessbackground.png', [0, 0])
+    GameplayBackground = BackgroundPhoto(os.path.join("Assets","Background","Chessbackground.png"), [0, 0])
     chosen = False
     print("chosen side menu Starting")
     buttonWidth = 150
@@ -97,13 +98,13 @@ def chooseSide():
             if event.type == pygame.QUIT:
                 pygame.quit()
 def start_game():
-    GameplayBackground = BackgroundPhoto('Assets\Background\Horses.jpg', [0, 0])
+    GameplayBackground = BackgroundPhoto(os.path.join("Assets","Background","Horses.jpg"), [0, 0])
     gamePlay: bool = True
     print("Starting the game now!")
     print("Game Mode:",Gamemode)
     if(Gamemode != mode.TwoPlayer):
         print("Player chosen side:", PlayerSide)
-    ChessBoard = Board(screen,Gamemode,mainMenu)
+    ChessBoard = Board(screen,Gamemode,mainMenu,PlayerSide)
 
     while gamePlay:
         screen.blit(GameplayBackground.image, GameplayBackground.rect)

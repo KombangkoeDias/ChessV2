@@ -1,8 +1,6 @@
 import pygame
-from ChessPiece import ChessPieces,EmptyPiece
-from type import type
-from side import side
-from Color import yellow,orange,red,purple
+from UserInterface.ChessPiece import EmptyPiece
+from UserInterface.Color import yellow,orange,red,purple
 
 class Square:
     def __init__(self,x,y,w,h,ic):

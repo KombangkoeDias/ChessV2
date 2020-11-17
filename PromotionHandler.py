@@ -1,8 +1,8 @@
 from side import side
 from type import type
-from ChessPiece import ChessPieces
-from Square import Square
-from Color import white,darkgreen
+from UserInterface.ChessPiece import ChessPieces
+from UserInterface.Square import Square
+from UserInterface.Color import white,darkgreen
 class PromotionHandler:
     def __init__(self,chessboard,screen):
         self.chessboard = chessboard

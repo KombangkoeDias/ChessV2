@@ -44,6 +44,8 @@ class EvaluateCheck: # it will check the walks or eats and filter them so that i
                     self.chessboard.findIJSquare(thisSquare)[1]
                 )
 
+
+
                 # if enpassant we store the enpassant piece and square in advance.
                 if (enpassant):
                     if (firstPiece.type == type.PawnB):
@@ -52,7 +54,7 @@ class EvaluateCheck: # it will check the walks or eats and filter them so that i
                         enpassantSquare = self.chessboard.getSquare(row+1,col)
                     enpassantPiece = enpassantSquare.Piece
                 # move without animation
-                self.chessboard.walkOrEatWithoutAnimation(firstSquare,Squares[i],enpassant)
+                self.chessboard.walkOrEatWithoutAnimation(firstSquare,thisSquare,enpassant)
 
                 # we will choose and not choose to add into resultlist
                 if(self.checkCheck(currentSide)): # if the move makes its own side checked then not include it
