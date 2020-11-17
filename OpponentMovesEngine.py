@@ -49,7 +49,6 @@ class Node:
         self.blackSumValue = 0
         self.chessboard = chessboard
         self.depth = depth
-        self.determineMoves()
         self.PlayerSide = self.chessboard.currentSide
         self.evaluateCheckEngine = EvaluateCheck(self.chessboard)
         self.evaluateMovesEngine = EvaluateMovesEngine(self.chessboard, self.evaluateCheckEngine)
@@ -57,6 +56,7 @@ class Node:
             self.OpponentSide = side.blackside
         else:
             self.OpponentSide = side.whiteside
+        self.determineMoves()
     def EvaluateScore(self):
         self.whiteSumValue = 0
         self.blackSumValue = 0
