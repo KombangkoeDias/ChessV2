@@ -41,7 +41,7 @@ class Board:
             self.currentSide = PlayerSide
         self.GameMode = GameMode
         self.mainMenuFunc = mainMenuFunc
-        self.OpponentMovesEngine = OpponentMovesEngine(self)
+
     def InitializeBoard(self):
         """ return the initialized board as SquareList"""
         self.Squarelist = list() # make it a list
@@ -238,9 +238,15 @@ class Board:
                                             self.boardActive = False
                                     if(self.GameMode != mode.TwoPlayer):
                                         if(self.GameMode == mode.OnePlayerAlphaBeta):
-                                            self.OpponentMovesEngine.findBestMovesUsingAlPhaBetaPruning()
+                                            opponentMovesEngine = OpponentMovesEngine(self)
+                                            OpponentMove = opponentMovesEngine.findBestMovesUsingAlPhaBetaPruning()
+                                            self.clicklist.append(OpponentMove.getFirstSquare())
+                                            self.clicklist.append(OpponentMove.getSecondSquare())
+                                            self.walkOrEat(OpponentMove.getEnpassant(),OpponentMove.getCastling())
+                                            self.clicklist.clear()
                                         else:
-                                            self.OpponentMovesEngine.findBestMovesUsingMachineLearning()
+                                            opponentMovesEngine = OpponentMovesEngine(self)
+                                            opponentMovesEngine.findBestMovesUsingMachineLearning()
 
                             elif (self.getSquare(i,j).Piece != self.clicklist[0].Piece): # in case that the second click is of the same side as the Piece in the first click this is the
                                 # changing chosen Piece case
@@ -421,15 +427,17 @@ class Board:
         return alphabetlist[pos[1]]+str(abs(pos[0]-8))
 
 
-    def reverseMoves(self):
+    def reverseMoves(self,test=False,lastmove=None):
         """ Reverse the last move from the move list """
         if(len(self.moves) > 0): # firstly there has to be more than 0 move to do reverse, obviously
             # clear these three lists whenever going back
             self.clicklist.clear() # clear the clicklist first
             self.possibleWalks.clear() # and the two list of walks and eats
             self.possibleEats.clear()
-
-            lastMove = self.moves[-1] # get the last move
+            if(not test):
+                lastMove = self.moves[-1] # get the last move
+            else:
+                lastMove = lastmove
             # get the squares and pieces
             square1 = lastMove.getFirstSquare()
             square2 = lastMove.getSecondSquare()
@@ -439,8 +447,9 @@ class Board:
             # and location of the two square
             location1 = square1.piecelocation
             location2 = square2.piecelocation
+            if(not test):
+                self.doAnimation(location2,location1,square2,square1,piece1) # do animation backward
 
-            self.doAnimation(location2,location1,square2,square1,piece1) # do animation backward
 
             square1.addPieces(piece1) # then really change the position of the pice.
             square2.addPieces(piece2)
@@ -486,8 +495,8 @@ class Board:
                         returnToNoKingMove = False
                 if(returnToNoKingMove): # if not then change the KingMove field
                     self.WhiteKingCastlingHandler.KingMove = False
-
-            self.moves.pop(-1) # and lastly, remove the last move in the move list.
+            if(not test):
+                self.moves.pop(-1) # and lastly, remove the last move in the move list.
 
             # also after moving back check again for check to draw purple squares.
             self.whiteischecked = self.evaluateCheckEngine.checkCheck(side.whiteside)

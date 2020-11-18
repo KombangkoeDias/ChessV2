@@ -17,6 +17,8 @@ class Moves:
         return self.firstPiece
     def getSecondPiece(self):
         return self.secondPiece
+    def getEnpassant(self):
+        return self.enPassant
     def getCastling(self):
         return self.castling
     def IsEatMove(self):
