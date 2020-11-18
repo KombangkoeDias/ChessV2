@@ -14,6 +14,7 @@ from UserInterface.DrawButtons import drawReverseMoveButton,drawBackButton
 from DrawsHandler.DrawHandler import DrawHandler
 from Mode import mode
 from OpponentMovesEngine import OpponentMovesEngine
+from stockfishIntegrationEngine import stockfishIntegrationEngine
 
 class Board:
     def __init__(self,screen,GameMode,mainMenuFunc,PlayerSide):
@@ -41,6 +42,8 @@ class Board:
             self.currentSide = PlayerSide
         self.GameMode = GameMode
         self.mainMenuFunc = mainMenuFunc
+        self.opponentMovesEngine = OpponentMovesEngine(self)
+        self.stockfishIntegrationEngine = stockfishIntegrationEngine(self)
 
     def InitializeBoard(self):
         """ return the initialized board as SquareList"""
@@ -210,6 +213,7 @@ class Board:
                                     self.possibleWalks.clear()  # after a move we clear the walklist
                                     self.possibleEats.clear()  # same
 
+                                    self.stockfishIntegrationEngine.moveFromPlayer(self.clicklist[0],self.clicklist[1])
                                     # call the function to handle walk or eat moves
                                     self.walkOrEat(enpassant,castling)
 
@@ -224,7 +228,6 @@ class Board:
                                     self.detectDraw()
 
                                     self.clicklist.clear() # after handling the walk or eat we clear the clicklist, obviously
-
                                     # in every moves we need to check if there is checking in the board for both black and white.
                                     self.whiteischecked = self.evaluateCheckEngine.checkCheck(side.whiteside)
                                     self.blackischecked = self.evaluateCheckEngine.checkCheck(side.blackside)
@@ -238,11 +241,23 @@ class Board:
                                             self.boardActive = False
                                     if(self.GameMode != mode.TwoPlayer):
                                         if(self.GameMode == mode.OnePlayerAlphaBeta):
-                                            opponentMovesEngine = OpponentMovesEngine(self)
-                                            OpponentMove = opponentMovesEngine.findBestMovesUsingAlPhaBetaPruning()
-                                            self.clicklist.append(OpponentMove.getFirstSquare())
-                                            self.clicklist.append(OpponentMove.getSecondSquare())
-                                            self.walkOrEat(OpponentMove.getEnpassant(),OpponentMove.getCastling())
+
+                                            #self.opponentMovesEngine.findBestMovesUsingAlPhaBetaPruning()
+                                            #OpponentMove = self.opponentMovesEngine.bestMove
+                                            firstSquare,secondSquare = self.stockfishIntegrationEngine.moveFromOpponent()
+                                            self.clicklist.append(firstSquare)
+                                            self.clicklist.append(secondSquare)
+                                            # for the enpassant to be true the move should be in possibleEats and it should be empty.
+                                            enpassant = self.clicklist[1] in self.possibleEats and self.clicklist[
+                                                1].Piece.type == type.Empty
+
+                                            # for the castling to be true the move should be of king and it shouldn't be adjacent to the original square
+                                            firstRow, firstCol = self.findIJSquare(self.clicklist[0])
+                                            secondRow, secondCol = self.findIJSquare(self.clicklist[1])
+                                            castling = (self.clicklist[0].Piece.type == type.KingW or self.clicklist[
+                                                0].Piece.type == type.KingB) \
+                                                       and abs(secondCol - firstCol) == 2
+                                            self.walkOrEat(enpassant,castling)
                                             self.clicklist.clear()
                                         else:
                                             opponentMovesEngine = OpponentMovesEngine(self)
@@ -512,6 +527,7 @@ class Board:
                 else:
                     self.currentSide = side.whiteside
             self.boardActive = True
+            self.stockfishIntegrationEngine.chessboard.pop()
 
     def printBoard(self):
         """ for debugging purpose """

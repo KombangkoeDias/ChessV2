@@ -7,6 +7,7 @@ from UserInterface.Color import gold,vegasgold,red,darkred, darkgreen
 from Mode import mode
 from side import side
 import os
+import threading
 
 pygame.init() # initiate the pygame library
 
@@ -108,6 +109,10 @@ def start_game():
 
     while gamePlay:
         screen.blit(GameplayBackground.image, GameplayBackground.rect)
+        '''
+        thread = threading.Thread(target=ChessBoard.detectClick())
+        thread.start()
+        '''
         ChessBoard.detectClick()
         ChessBoard.drawBoardAndPieces()
         drawReverseMoveButton(screen,Width,Height,ChessBoard)
