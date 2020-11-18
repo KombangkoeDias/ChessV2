@@ -429,6 +429,8 @@ class Board:
 
     def reverseMoves(self,test=False,lastmove=None):
         """ Reverse the last move from the move list """
+        # if test is true it means we don't remove the move from movelist and when the lastmove is specified we'll
+        # use lastmove from the variable lastmove instead of the last of self.moves list.
         if(len(self.moves) > 0): # firstly there has to be more than 0 move to do reverse, obviously
             # clear these three lists whenever going back
             self.clicklist.clear() # clear the clicklist first
@@ -447,7 +449,7 @@ class Board:
             # and location of the two square
             location1 = square1.piecelocation
             location2 = square2.piecelocation
-            if(not test):
+            if(not test): # also if testing we don't do animation.
                 self.doAnimation(location2,location1,square2,square1,piece1) # do animation backward
 
 
@@ -495,7 +497,7 @@ class Board:
                         returnToNoKingMove = False
                 if(returnToNoKingMove): # if not then change the KingMove field
                     self.WhiteKingCastlingHandler.KingMove = False
-            if(not test):
+            if(not test): # if not testing we remove last move.
                 self.moves.pop(-1) # and lastly, remove the last move in the move list.
 
             # also after moving back check again for check to draw purple squares.
