@@ -5,7 +5,7 @@ import chess.engine
 class stockfishIntegrationEngine:
     def __init__(self,chessboard):
         self.chessboard = chess.Board()
-        self.engine = chess.engine.SimpleEngine.popen_uci("/Users/Kombangkoe Dias/Downloads/stockfish")
+        self.engine = chess.engine.SimpleEngine.popen_uci("/Users/Kombangkoe Dias/PycharmProjects/ChessV2/Engine/stockfish")
         self.KBDchessboard = chessboard
     def getNumberOfSquareFromIJ(self,IJ):
         i = IJ[0]
