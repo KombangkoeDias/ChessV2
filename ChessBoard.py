@@ -423,15 +423,15 @@ class Board:
         Width, Height = pygame.display.get_surface().get_size()
         drawBackButton(self.screen, Width, Height, self.mainMenuFunc) # for consistency of Back button
 
-        # divide moves animation into 50 frames.
-        for i in range(50):
-            movementx = differencex / 50 * i # the x velocity
-            movementy = differencey / 50 * i # the y velocity
+        # divide moves animation into 100 frames.
+        for i in range(30):
+            movementx = differencex / 30 * i # the x velocity
+            movementy = differencey / 30 * i # the y velocity
             pygame.time.delay(1) # some delay
             myPiece.addlocation((firstx + movementx, firsty + movementy)) # then change the location
             self.drawBoardAndPieces() # and draw it again
 
-            if i == 30: # play sounds at the frame 30
+            if i == 15: # play sounds at the frame 30
                 moveSound = pygame.mixer.Sound('Assets/Sounds/moveSound.wav')
                 moveSound.play()
             pygame.display.update() # and update the display
